@@ -1,26 +1,44 @@
 #!/usr/bin/env python
 """
-Evaluate multiple user simulator + system agent combinations on MultiWOZ 2.1.
+Evaluate user simulator + system agent combinations on MultiWOZ 2.1 test set.
 
 Combinations:
-  1. semantic_rule_us_rule_sys      -- Rule US (DA) + Rule Sys (DA)
-  2. nl_rule_us_llmnlu_rule_sys     -- Rule US (TemplateNLG) + LLM_NLU on both sides
-  3. llm_us_llm_rg                  -- LLM_US + LLM_RG end-to-end
-  4. llm_us_rule_sys                -- LLM_US user + Rule pipeline system (text level)
+  1. rule_us_rule_sys   -- Rule-based user simulator + Rule-based system (semantic)
+  2. tus_rule_sys       -- TUS neural user sim + Rule-based system
+  3. gentus_rule_sys    -- GenTUS generative neural user sim + Rule-based system
+  4. llm_us_llm_rg      -- LLM user simulator + LLM response generator
+  5. llm_us_rule_sys     -- LLM user simulator + Rule-based pipeline system
+
+Set N_DIALOGUES to subsample the test set (1000 = full test set).
 """
 
-import os
-import sys
 import json
+import logging
+import os
 import random
+import sys
 import traceback
-import numpy as np
 from copy import deepcopy
 from datetime import datetime
 
-SEED = 20200202
+import numpy as np
+
+# Suppress litellm / httpx noise before any imports that pull them in
+os.environ["LITELLM_LOG"] = "ERROR"
+logging.getLogger("LiteLLM").setLevel(logging.ERROR)
+logging.getLogger("litellm").setLevel(logging.ERROR)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+import litellm
+
+litellm.suppress_debug_info = True
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "ConvLab-3"))
+
+SEED = 42
+N_DIALOGUES = 10
 LLM_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
-RESULTS_DIR = "experiment_results"
+OUT_ROOT = "experiment_results"
 
 
 def set_seed(seed):
@@ -28,15 +46,37 @@ def set_seed(seed):
     np.random.seed(seed)
     try:
         import torch
+
         torch.manual_seed(seed)
     except ImportError:
         pass
 
 
 # ---------------------------------------------------------------------------
-# Compatibility DST that bridges ConvLab-3 unified format to the old
-# semi/book state format expected by RuleBasedMultiwozBot.
-# Also remaps user_action slot names from new -> old display format.
+# Fix corrupted goal descriptions (preprocess.py bug: '. '.join on a string)
+# ---------------------------------------------------------------------------
+def _repair_description(description):
+    """Fix descriptions corrupted by '. '.join() applied to a string instead of
+    a list, which inserts '. ' between every character."""
+    parts = description.split(". ")
+    if len(parts) > 10 and sum(len(p) <= 2 for p in parts) / len(parts) > 0.8:
+        return "".join(parts)
+    return description
+
+
+def _repair_goal(goal):
+    """Return a copy of goal with a repaired description field."""
+    desc = goal.get("description", "") or ""
+    repaired = _repair_description(desc)
+    if repaired != desc:
+        goal = deepcopy(goal)
+        goal["description"] = repaired
+    return goal
+
+
+# ---------------------------------------------------------------------------
+# Compatibility DST: bridges ConvLab-3 unified format to the old semi/book
+# state format expected by RuleBasedMultiwozBot.
 # ---------------------------------------------------------------------------
 from convlab.dst.dst import DST
 from convlab.util.multiwoz.multiwoz_slot_trans import REF_USR_DA
@@ -53,14 +93,13 @@ SLOT_NEW_TO_OLD = {
     "entrance fee": "entrance fee",
 }
 
-# ConvLab-3 slot name -> display name expected by the system bot in user_action
 _SLOT_DISPLAY = {}
 for _dom, _mapping in REF_USR_DA.items():
     for _old, _disp in _mapping.items():
         _SLOT_DISPLAY[(_dom.lower(), _old)] = _disp
 
+
 def _to_display_slot(domain, new_slot):
-    """Convert a ConvLab-3 slot name to the display slot name the system bot expects."""
     old = SLOT_NEW_TO_OLD.get(new_slot, new_slot)
     return _SLOT_DISPLAY.get((domain.lower(), old), new_slot)
 
@@ -74,6 +113,7 @@ class CompatRuleDST(DST):
 
     def _init_state(self):
         from convlab.util.multiwoz.state import default_state_old
+
         self.state = default_state_old()
         self.state.setdefault("booked", {})
 
@@ -81,8 +121,6 @@ class CompatRuleDST(DST):
         self._init_state()
 
     def _place_slot(self, dom, old_slot, value):
-        """Route slot to the correct sub-dict (book vs semi) by checking the
-        actual state structure for this domain, not a global set."""
         bs = self.state["belief_state"].get(dom)
         if not bs or old_slot in ("none", ""):
             return
@@ -118,283 +156,484 @@ class CompatRuleDST(DST):
 
 
 # ---------------------------------------------------------------------------
-# Combo 1 – pure semantic (DA-level) rule-based baseline
+# Helpers
 # ---------------------------------------------------------------------------
-def run_semantic_rule(n_dialogues=100):
+def _load_test_goals():
+    from convlab.util.unified_datasets_util import load_dataset
+
+    dataset = load_dataset("multiwoz21")
+    goals = [_repair_goal(d["goal"]) for d in dataset["test"][:N_DIALOGUES]]
+    return goals
+
+
+def _save(out_dir, combo_name, results, extra_summary=None):
+    os.makedirs(out_dir, exist_ok=True)
+
+    completed_count = sum(1 for r in results if r["completed"])
+    success_count = sum(1 for r in results if r.get("success", False))
+    total = len(results)
+
+    summary = {
+        "combo": combo_name,
+        "n_dialogues": total,
+        "completion_rate": completed_count / max(total, 1),
+        "success_rate": success_count / max(total, 1),
+        "avg_turns": float(np.mean([r["turns"] for r in results])),
+    }
+    if extra_summary:
+        summary.update(extra_summary)
+
+    with open(os.path.join(out_dir, "results.json"), "w") as f:
+        json.dump(
+            {"summary": summary, "per_dialogue": results}, f, indent=2, default=str
+        )
+
+    with open(os.path.join(out_dir, "summary.txt"), "w") as f:
+        for k, v in summary.items():
+            if isinstance(v, float):
+                f.write(f"{k}: {v:.4f}\n")
+            else:
+                f.write(f"{k}: {v}\n")
+
+    print(f"\n  --- {combo_name} summary ---")
+    for k, v in summary.items():
+        print(f"    {k}: {v:.4f}" if isinstance(v, float) else f"    {k}: {v}")
+    return summary
+
+
+# =========================================================================
+# 1. Rule US + Rule Sys (semantic level, with NL post-processing)
+# =========================================================================
+def run_rule_us_rule_sys():
+    from convlab.dialog_agent import BiSession, PipelineAgent
+    from convlab.evaluator.multiwoz_eval import MultiWozEvaluator
+    from convlab.nlg.template.multiwoz import TemplateNLG
     from convlab.policy.rule.multiwoz import RulePolicy
-    from convlab.dialog_agent import PipelineAgent
-    from convlab.util.analysis_tool.analyzer import Analyzer
 
     sys_agent = PipelineAgent(None, CompatRuleDST(), RulePolicy(), None, name="sys")
-    user_agent = PipelineAgent(None, None, RulePolicy(character="usr"), None, name="user")
-
-    analyzer = Analyzer(user_agent=user_agent, dataset="multiwoz")
-    set_seed(SEED)
-    return analyzer.comprehensive_analyze(
-        sys_agent=sys_agent,
-        model_name="semantic_rule_us_rule_sys",
-        total_dialog=n_dialogues,
-    )
-
-
-# ---------------------------------------------------------------------------
-# Combo 2 – text-level with LLM NLU on both sides + TemplateNLG
-# ---------------------------------------------------------------------------
-def run_nl_rule_llmnlu(n_dialogues=20):
-    from convlab.policy.rule.multiwoz import RulePolicy
-    from convlab.nlg.template.multiwoz import TemplateNLG
-    from convlab.base_models.llm.nlu import LLM_NLU
-    from convlab.dialog_agent import PipelineAgent
-    from convlab.util.analysis_tool.analyzer import Analyzer
-    from convlab.util.unified_datasets_util import load_dataset
-
-    dataset = load_dataset("multiwoz21")
-    example_dialogs = dataset["train"][:3]
-
-    user_nlu = LLM_NLU("multiwoz21", "litellm", LLM_MODEL, "system", example_dialogs)
     user_agent = PipelineAgent(
-        user_nlu, None, RulePolicy(character="usr"), TemplateNLG(is_user=True), name="user"
+        None, None, RulePolicy(character="usr"), None, name="user"
     )
+    evaluator = MultiWozEvaluator()
 
-    sys_nlu = LLM_NLU("multiwoz21", "litellm", LLM_MODEL, "user", example_dialogs)
-    sys_agent = PipelineAgent(
-        sys_nlu, CompatRuleDST(), RulePolicy(), TemplateNLG(is_user=False), name="sys"
-    )
+    user_nlg = TemplateNLG(is_user=True)
+    sys_nlg = TemplateNLG(is_user=False)
 
-    analyzer = Analyzer(user_agent=user_agent, dataset="multiwoz")
+    def _da_to_nl(da, nlg):
+        try:
+            return nlg.generate(da)
+        except Exception:
+            return str(da)
+
     set_seed(SEED)
-    return analyzer.comprehensive_analyze(
-        sys_agent=sys_agent,
-        model_name="nl_rule_us_llmnlu_rule_sys",
-        total_dialog=n_dialogues,
+    results = []
+    for i in range(N_DIALOGUES):
+        seed_i = random.randint(1, 100000)
+        random.seed(seed_i)
+        np.random.seed(seed_i)
+
+        sess = BiSession(
+            sys_agent=sys_agent,
+            user_agent=user_agent,
+            kb_query=None,
+            evaluator=evaluator,
+        )
+        sess.init_session()
+
+        sys_response = []
+        conversation = []
+        for t in range(40):
+            sys_response, user_response, session_over, reward = sess.next_turn(
+                sys_response
+            )
+            conversation.append(
+                {
+                    "turn": t,
+                    "user_da": str(user_response),
+                    "user_nl": _da_to_nl(user_response, user_nlg),
+                    "system_da": str(sys_response),
+                    "system_nl": _da_to_nl(sys_response, sys_nlg),
+                }
+            )
+            if session_over:
+                break
+
+        task_success = sess.evaluator.task_success()
+        task_complete = sess.evaluator.complete
+        stats = sess.evaluator.inform_F1()
+
+        results.append(
+            {
+                "dialogue_id": i,
+                "seed": seed_i,
+                "turns": len(conversation),
+                "completed": bool(task_complete),
+                "success": bool(task_success),
+                "inform_f1": stats[2],
+                "book_rate": sess.evaluator.book_rate(),
+                "conversation": conversation,
+            }
+        )
+        if (i + 1) % 50 == 0 or i == N_DIALOGUES - 1:
+            print(
+                f"  Dialog {i + 1}/{N_DIALOGUES}: turns={len(conversation)} "
+                f"complete={task_complete} success={task_success}"
+            )
+
+    return _save(
+        os.path.join(OUT_ROOT, "rule_us_rule_sys"), "rule_us_rule_sys", results
     )
 
 
-# ---------------------------------------------------------------------------
-# Combo 3 – fully LLM: LLM_US + LLM_RG (custom eval loop)
-# ---------------------------------------------------------------------------
-def run_llm_us_llm_rg(n_dialogues=20):
-    from convlab.base_models.llm.user_simulator import LLM_US, LLM_RG
-    from convlab.util.unified_datasets_util import load_dataset
+# =========================================================================
+# 2. TUS (neural user sim) + Rule Sys
+# =========================================================================
+def run_tus_rule_sys():
+    import json as _json
 
-    dataset = load_dataset("multiwoz21")
-    goals = [d["goal"] for d in dataset["validation"][:n_dialogues]]
+    from convlab.dialog_agent import BiSession, PipelineAgent
+    from convlab.evaluator.multiwoz_eval import MultiWozEvaluator
+    from convlab.nlg.template.multiwoz import TemplateNLG
+    from convlab.policy.rule.multiwoz import RulePolicy
+    from convlab.policy.tus.unify.TUS import UserPolicy as TUSPolicy
 
+    config = _json.load(open("ConvLab-3/convlab/policy/tus/unify/exp/multiwoz.json"))
+    user_policy = TUSPolicy(config, dial_ids_order=0)
+    user_agent = PipelineAgent(None, None, user_policy, None, name="user")
+
+    sys_agent = PipelineAgent(None, CompatRuleDST(), RulePolicy(), None, name="sys")
+    evaluator = MultiWozEvaluator()
+
+    user_nlg = TemplateNLG(is_user=True)
+    sys_nlg = TemplateNLG(is_user=False)
+
+    def _da_to_nl(da, nlg):
+        try:
+            return nlg.generate(da)
+        except Exception:
+            return str(da)
+
+    set_seed(SEED)
+    results = []
+    for i in range(N_DIALOGUES):
+        seed_i = random.randint(1, 100000)
+        random.seed(seed_i)
+        np.random.seed(seed_i)
+
+        sess = BiSession(
+            sys_agent=sys_agent,
+            user_agent=user_agent,
+            kb_query=None,
+            evaluator=evaluator,
+        )
+        sess.init_session()
+
+        sys_response = []
+        conversation = []
+        for t in range(40):
+            sys_response, user_response, session_over, reward = sess.next_turn(
+                sys_response
+            )
+            conversation.append(
+                {
+                    "turn": t,
+                    "user_da": str(user_response),
+                    "user_nl": _da_to_nl(user_response, user_nlg),
+                    "system_da": str(sys_response),
+                    "system_nl": _da_to_nl(sys_response, sys_nlg),
+                }
+            )
+            if session_over:
+                break
+
+        task_success = sess.evaluator.task_success()
+        task_complete = sess.evaluator.complete
+        stats = sess.evaluator.inform_F1()
+
+        results.append(
+            {
+                "dialogue_id": i,
+                "seed": seed_i,
+                "turns": len(conversation),
+                "completed": bool(task_complete),
+                "success": bool(task_success),
+                "inform_f1": stats[2],
+                "book_rate": sess.evaluator.book_rate(),
+                "conversation": conversation,
+            }
+        )
+        if (i + 1) % 50 == 0 or i == N_DIALOGUES - 1:
+            print(
+                f"  Dialog {i + 1}/{N_DIALOGUES}: turns={len(conversation)} "
+                f"complete={task_complete} success={task_success}"
+            )
+
+    return _save(os.path.join(OUT_ROOT, "tus_rule_sys"), "tus_rule_sys", results)
+
+
+# =========================================================================
+# 3. GenTUS (generative neural user sim) + Rule Sys
+# =========================================================================
+def run_gentus_rule_sys():
+    from convlab.dialog_agent import BiSession, PipelineAgent
+    from convlab.evaluator.multiwoz_eval import MultiWozEvaluator
+    from convlab.nlg.template.multiwoz import TemplateNLG
+    from convlab.policy.genTUS.stepGenTUS import UserPolicy as GenTUSPolicy
+    from convlab.policy.rule.multiwoz import RulePolicy
+
+    user_policy = GenTUSPolicy(mode="semantic")
+    user_agent = PipelineAgent(None, None, user_policy, None, name="user")
+
+    sys_agent = PipelineAgent(None, CompatRuleDST(), RulePolicy(), None, name="sys")
+    evaluator = MultiWozEvaluator()
+
+    user_nlg = TemplateNLG(is_user=True)
+    sys_nlg = TemplateNLG(is_user=False)
+
+    def _da_to_nl(da, nlg):
+        try:
+            return nlg.generate(da)
+        except Exception:
+            return str(da)
+
+    set_seed(SEED)
+    results = []
+    for i in range(N_DIALOGUES):
+        seed_i = random.randint(1, 100000)
+        random.seed(seed_i)
+        np.random.seed(seed_i)
+
+        sess = BiSession(
+            sys_agent=sys_agent,
+            user_agent=user_agent,
+            kb_query=None,
+            evaluator=evaluator,
+        )
+        sess.init_session()
+
+        sys_response = []
+        conversation = []
+        for t in range(40):
+            sys_response, user_response, session_over, reward = sess.next_turn(
+                sys_response
+            )
+            conversation.append(
+                {
+                    "turn": t,
+                    "user_da": str(user_response),
+                    "user_nl": _da_to_nl(user_response, user_nlg),
+                    "system_da": str(sys_response),
+                    "system_nl": _da_to_nl(sys_response, sys_nlg),
+                }
+            )
+            if session_over:
+                break
+
+        task_success = sess.evaluator.task_success()
+        task_complete = sess.evaluator.complete
+        stats = sess.evaluator.inform_F1()
+
+        results.append(
+            {
+                "dialogue_id": i,
+                "seed": seed_i,
+                "turns": len(conversation),
+                "completed": bool(task_complete),
+                "success": bool(task_success),
+                "inform_f1": stats[2],
+                "book_rate": sess.evaluator.book_rate(),
+                "conversation": conversation,
+            }
+        )
+        if (i + 1) % 50 == 0 or i == N_DIALOGUES - 1:
+            print(
+                f"  Dialog {i + 1}/{N_DIALOGUES}: turns={len(conversation)} "
+                f"complete={task_complete} success={task_success}"
+            )
+
+    return _save(os.path.join(OUT_ROOT, "gentus_rule_sys"), "gentus_rule_sys", results)
+
+
+# =========================================================================
+# 4. LLM US + LLM RG (end-to-end)
+# =========================================================================
+def run_llm_us_llm_rg():
+    from convlab.base_models.llm.user_simulator import LLM_RG, LLM_US
+
+    goals = _load_test_goals()
     user_model = LLM_US("litellm", LLM_MODEL)
     system_model = LLM_RG("litellm", LLM_MODEL)
 
     results = []
     for i, goal in enumerate(goals):
-        print(f"\n{'='*50}\nDialogue {i+1}/{len(goals)}")
+        if (i + 1) % 10 == 0 or i == 0:
+            print(f"  Dialog {i + 1}/{len(goals)} ...")
         try:
             user_model.init_session(goal)
             system_model.init_session()
 
             sys_msg = "Hello, how may I help you today?"
-            conversation = [{"role": "system", "content": sys_msg}]
+            conversation = [{"turn": 0, "system": sys_msg}]
             turns = 0
 
             for _ in range(20):
                 user_msg = user_model.response(sys_msg)
-                conversation.append({"role": "user", "content": user_msg})
-
                 if user_model.is_terminated:
+                    conversation.append({"turn": turns, "user": user_msg})
                     break
-
                 sys_msg = system_model.response(user_msg)
-                conversation.append({"role": "assistant", "content": sys_msg})
                 turns += 1
+                conversation.append(
+                    {"turn": turns, "user": user_msg, "system": sys_msg}
+                )
 
             completed = user_model.is_terminated and any(
-                "[END]" in c.get("content", "") for c in conversation if c["role"] == "user"
+                "[END]" in str(c.get("user", "")) for c in conversation
             )
             reward = user_model.get_reward()
         except Exception as e:
-            print(f"  Error in dialogue {i}: {e}")
-            completed = False
-            reward = None
-            conversation = []
-            turns = 0
+            print(f"    Error: {e}")
+            completed, reward, conversation, turns = False, None, [], 0
 
-        results.append({
-            "dialogue_id": i,
-            "goal_description": goal.get("description", ""),
-            "turns": turns,
-            "completed": completed,
-            "reward": reward,
-            "conversation": conversation,
-        })
-        print(f"  Turns: {turns}, Completed: {completed}, Reward: {reward}")
+        results.append(
+            {
+                "dialogue_id": i,
+                "goal_description": goal.get("description", ""),
+                "turns": turns,
+                "completed": completed,
+                "success": completed,
+                "reward": reward,
+                "conversation": conversation,
+            }
+        )
 
-    out_dir = os.path.join(RESULTS_DIR, "llm_us_llm_rg")
-    os.makedirs(out_dir, exist_ok=True)
-
-    completed_count = sum(1 for r in results if r["completed"])
-    rewards = [r["reward"] for r in results if r["reward"] is not None]
-    summary = {
-        "model": LLM_MODEL,
-        "total_dialogs": len(results),
-        "completed_rate": completed_count / max(len(results), 1),
-        "avg_turns": float(np.mean([r["turns"] for r in results])),
-        "avg_reward": float(np.mean(rewards)) if rewards else None,
-    }
-
-    with open(os.path.join(out_dir, "results.json"), "w") as f:
-        json.dump({"summary": summary, "dialogs": results}, f, indent=2, default=str)
-    with open(os.path.join(out_dir, "summary.txt"), "w") as f:
-        for k, v in summary.items():
-            f.write(f"{k}: {v}\n")
-
-    print(f"\nLLM_US + LLM_RG summary:")
-    for k, v in summary.items():
-        print(f"  {k}: {v}")
-    return summary
+    return _save(
+        os.path.join(OUT_ROOT, "llm_us_llm_rg"),
+        "llm_us_llm_rg",
+        results,
+        extra_summary={"model": LLM_MODEL},
+    )
 
 
-# ---------------------------------------------------------------------------
-# Combo 4 – LLM_US user + rule-based pipeline system (text level)
-# ---------------------------------------------------------------------------
-def run_llm_us_rule_sys(n_dialogues=20):
-    from convlab.policy.rule.multiwoz import RulePolicy
-    from convlab.nlg.template.multiwoz import TemplateNLG
-    from convlab.dialog_agent import PipelineAgent
+# =========================================================================
+# 5. LLM US + Rule pipeline system (NLU->DST->Policy->NLG)
+# =========================================================================
+def run_llm_us_rule_sys():
     from convlab.base_models.llm.nlu import LLM_NLU
     from convlab.base_models.llm.user_simulator import LLM_US
+    from convlab.dialog_agent import PipelineAgent
+    from convlab.nlg.template.multiwoz import TemplateNLG
+    from convlab.policy.rule.multiwoz import RulePolicy
     from convlab.util.unified_datasets_util import load_dataset
 
     dataset = load_dataset("multiwoz21")
     example_dialogs = dataset["train"][:3]
-    goals = [d["goal"] for d in dataset["validation"][:n_dialogues]]
+    goals = _load_test_goals()
 
     sys_nlu = LLM_NLU("multiwoz21", "litellm", LLM_MODEL, "user", example_dialogs)
     sys_agent = PipelineAgent(
         sys_nlu, CompatRuleDST(), RulePolicy(), TemplateNLG(is_user=False), name="sys"
     )
-
     user_model = LLM_US("litellm", LLM_MODEL)
 
     results = []
     for i, goal in enumerate(goals):
-        print(f"\n{'='*50}\nDialogue {i+1}/{len(goals)}")
+        if (i + 1) % 10 == 0 or i == 0:
+            print(f"  Dialog {i + 1}/{len(goals)} ...")
         try:
             user_model.init_session(goal)
             sys_agent.init_session()
 
             sys_msg = "Hello, how may I help you today?"
-            conversation = [{"role": "system", "content": sys_msg}]
+            conversation = [{"turn": 0, "system": sys_msg}]
             turns = 0
 
             for _ in range(20):
                 user_msg = user_model.response(sys_msg)
-                conversation.append({"role": "user", "content": user_msg})
-
                 if user_model.is_terminated:
+                    conversation.append({"turn": turns, "user": user_msg})
                     break
-
                 sys_msg = sys_agent.response(user_msg)
-                conversation.append({"role": "assistant", "content": sys_msg})
                 turns += 1
+                conversation.append(
+                    {"turn": turns, "user": user_msg, "system": sys_msg}
+                )
 
             completed = user_model.is_terminated and any(
-                "[END]" in c.get("content", "") for c in conversation if c["role"] == "user"
+                "[END]" in str(c.get("user", "")) for c in conversation
             )
             reward = user_model.get_reward()
         except Exception as e:
-            print(f"  Error in dialogue {i}: {e}")
+            print(f"    Error: {e}")
             traceback.print_exc()
-            completed = False
-            reward = None
-            conversation = []
-            turns = 0
+            completed, reward, conversation, turns = False, None, [], 0
 
-        results.append({
-            "dialogue_id": i,
-            "goal_description": goal.get("description", ""),
-            "turns": turns,
-            "completed": completed,
-            "reward": reward,
-            "conversation": conversation,
-        })
-        print(f"  Turns: {turns}, Completed: {completed}, Reward: {reward}")
+        results.append(
+            {
+                "dialogue_id": i,
+                "goal_description": goal.get("description", ""),
+                "turns": turns,
+                "completed": completed,
+                "success": completed,
+                "reward": reward,
+                "conversation": conversation,
+            }
+        )
 
-    out_dir = os.path.join(RESULTS_DIR, "llm_us_rule_sys")
-    os.makedirs(out_dir, exist_ok=True)
-
-    completed_count = sum(1 for r in results if r["completed"])
-    rewards = [r["reward"] for r in results if r["reward"] is not None]
-    summary = {
-        "model": LLM_MODEL,
-        "total_dialogs": len(results),
-        "completed_rate": completed_count / max(len(results), 1),
-        "avg_turns": float(np.mean([r["turns"] for r in results])),
-        "avg_reward": float(np.mean(rewards)) if rewards else None,
-    }
-
-    with open(os.path.join(out_dir, "results.json"), "w") as f:
-        json.dump({"summary": summary, "dialogs": results}, f, indent=2, default=str)
-    with open(os.path.join(out_dir, "summary.txt"), "w") as f:
-        for k, v in summary.items():
-            f.write(f"{k}: {v}\n")
-
-    print(f"\nLLM_US + Rule Sys summary:")
-    for k, v in summary.items():
-        print(f"  {k}: {v}")
-    return summary
+    return _save(
+        os.path.join(OUT_ROOT, "llm_us_rule_sys"),
+        "llm_us_rule_sys",
+        results,
+        extra_summary={"model": LLM_MODEL},
+    )
 
 
-# ---------------------------------------------------------------------------
+# =========================================================================
 # Main
-# ---------------------------------------------------------------------------
+# =========================================================================
 COMBOS = [
-    ("semantic_rule_us_rule_sys", run_semantic_rule, {"n_dialogues": 100}),
-    ("llm_us_llm_rg", run_llm_us_llm_rg, {"n_dialogues": 20}),
-    ("llm_us_rule_sys", run_llm_us_rule_sys, {"n_dialogues": 20}),
+    ("rule_us_rule_sys", run_rule_us_rule_sys),
+    ("tus_rule_sys", run_tus_rule_sys),
+    ("gentus_rule_sys", run_gentus_rule_sys),
+    ("llm_us_llm_rg", run_llm_us_llm_rg),
+    ("llm_us_rule_sys", run_llm_us_rule_sys),
 ]
 
 
 def main():
-    os.makedirs(RESULTS_DIR, exist_ok=True)
-    all_results = {}
+    os.makedirs(OUT_ROOT, exist_ok=True)
+    all_summaries = {}
 
-    for name, func, kwargs in COMBOS:
-        print(f"\n{'#'*80}")
-        print(f"# Running: {name}")
-        print(f"{'#'*80}\n")
+    for name, func in COMBOS:
+        print(f"\n{'#' * 70}")
+        print(f"# {name}")
+        print(f"{'#' * 70}")
         try:
-            result = func(**kwargs)
-            if isinstance(result, tuple):
-                labels = [
-                    "complete_rate", "success_rate", "precision",
-                    "recall", "f1", "book_rate", "avg_turn",
-                ]
-                all_results[name] = dict(zip(labels, [float(v) for v in result]))
-            else:
-                all_results[name] = result
-            print(f"\nSUCCESS: {name}")
+            all_summaries[name] = func()
         except Exception:
             traceback.print_exc()
-            all_results[name] = {"error": traceback.format_exc()}
-            print(f"\nFAILED: {name} -- skipping")
+            all_summaries[name] = {"error": traceback.format_exc()[:500]}
+            print(f"  FAILED: {name}")
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    summary_path = os.path.join(RESULTS_DIR, f"all_results_{timestamp}.json")
-    with open(summary_path, "w") as f:
-        json.dump(all_results, f, indent=2)
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    path = os.path.join(OUT_ROOT, f"all_summaries_{ts}.json")
+    with open(path, "w") as f:
+        json.dump(all_summaries, f, indent=2)
 
-    print(f"\n{'='*80}")
-    print("FINAL RESULTS SUMMARY")
-    print(f"{'='*80}")
-    for name, result in all_results.items():
-        print(f"\n  {name}:")
-        if isinstance(result, dict):
-            for k, v in result.items():
-                if k == "error":
-                    print(f"    ERROR: {v[:200]}")
-                elif isinstance(v, float):
-                    print(f"    {k}: {v:.4f}")
-                else:
-                    print(f"    {k}: {v}")
-    print(f"\nResults saved to {summary_path}")
+    print(f"\n{'=' * 70}")
+    print(f"FINAL RESULTS  ({N_DIALOGUES} test dialogues each)")
+    print(f"{'=' * 70}")
+    print(f"{'Combo':<25} {'Completion':>12} {'Success':>12} {'Avg Turns':>12}")
+    print("-" * 61)
+    for name, s in all_summaries.items():
+        if "error" in s:
+            print(f"{name:<25} {'ERROR':>12}")
+        else:
+            print(
+                f"{name:<25} {s['completion_rate']:>11.0%} "
+                f"{s['success_rate']:>11.0%} {s['avg_turns']:>11.1f}"
+            )
+    print(f"\nSaved to {path}")
 
 
 if __name__ == "__main__":

@@ -22,9 +22,20 @@ INITIAL_SYSTEM_GREETING = "Hello, how may I help you today?"
 HF_REPO = "slingshot/multiwoz-2.1-convlab"
 
 
+def _repair_description(description):
+    """Fix descriptions corrupted by preprocess.py joining a string (not a list)
+    with '. ', which inserts '. ' between every character.  Detected when >80%
+    of the '. '-split parts are single characters."""
+    parts = description.split('. ')
+    if len(parts) > 10 and sum(len(p) <= 2 for p in parts) / len(parts) > 0.8:
+        return ''.join(parts)
+    return description
+
+
 def build_system_prompt(goal):
-    """Replicate the exact system prompt construction from LLM_US.init_session."""
-    description = goal.get("description", "") or ""
+    """Replicate the system prompt construction from LLM_US.init_session,
+    with a repair pass for corrupted descriptions."""
+    description = _repair_description(goal.get("description", "") or "")
     goal_description = '.\n'.join(
         ['* ' + item for item in description.split('. ')]
     )

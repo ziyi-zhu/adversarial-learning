@@ -15,10 +15,9 @@ import json, os, math, sys
 from collections import Counter
 from pathlib import Path
 
-RESULTS_DIR = "experiment_results/test10"
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "ConvLab-3"))
 
-# For rule_us_rule_sys, user text is in "user_nl"; for LLM combos it's in "user" field of conversation.
-# For TUS/GenTUS, user text is in "user_nl".
+RESULTS_DIR = "experiment_results"
 
 def extract_user_utterances(results_path):
     with open(results_path) as f:
@@ -86,25 +85,55 @@ def compute_metrics(utterances):
     }
 
 
+def extract_ground_truth_utterances(n_dialogues=None):
+    """Extract user utterances from the MultiWOZ 2.1 test split."""
+    from convlab.util.unified_datasets_util import load_dataset
+    dataset = load_dataset("multiwoz21")
+    test_dialogues = dataset["test"]
+    if n_dialogues is not None:
+        test_dialogues = test_dialogues[:n_dialogues]
+
+    utterances = []
+    for dlg in test_dialogues:
+        for turn in dlg["turns"]:
+            if turn["speaker"] == "user":
+                text = turn["utterance"].strip()
+                if text:
+                    utterances.append(text)
+    return utterances
+
+
 def main():
-    combos = [
-        "rule_us_rule_sys",
-        "tus_rule_sys",
-        "gentus_rule_sys",
-        "llm_us_llm_rg",
-        "llm_us_rule_sys",
-    ]
-
     all_metrics = {}
-    for combo in combos:
-        results_path = os.path.join(RESULTS_DIR, combo, "results.json")
-        if not os.path.exists(results_path):
-            print(f"  {combo}: results.json not found, skipping")
-            continue
 
-        utterances = extract_user_utterances(results_path)
+    # Detect how many dialogues were used in baselines (from any results file)
+    n_dialogues = None
+    for entry in sorted(os.listdir(RESULTS_DIR)):
+        results_path = os.path.join(RESULTS_DIR, entry, "results.json")
+        if os.path.isfile(results_path):
+            with open(results_path) as f:
+                data = json.load(f)
+            n_dialogues = data.get("summary", {}).get("n_dialogues")
+            if n_dialogues:
+                break
+
+    gt_utterances = extract_ground_truth_utterances(n_dialogues)
+    all_metrics["ground_truth"] = compute_metrics(gt_utterances)
+
+    for entry in sorted(os.listdir(RESULTS_DIR)):
+        results_path = os.path.join(RESULTS_DIR, entry, "results.json")
+        if not os.path.isfile(results_path):
+            continue
+        try:
+            utterances = extract_user_utterances(results_path)
+        except (KeyError, json.JSONDecodeError):
+            print(f"  {entry}: could not parse results.json, skipping")
+            continue
+        if not utterances:
+            print(f"  {entry}: no user utterances found, skipping")
+            continue
         metrics = compute_metrics(utterances)
-        all_metrics[combo] = metrics
+        all_metrics[entry] = metrics
 
     header = f"{'Combo':<22} {'Utts':>5} {'Tokens':>7} {'TTR':>6} {'D-1':>6} {'D-2':>6} {'D-3':>6} {'Entropy':>8} {'AvgLen':>7}"
     print(header)
