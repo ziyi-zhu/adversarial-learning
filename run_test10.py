@@ -260,10 +260,154 @@ def run_llm_us_rule_sys():
 
 
 # =========================================================================
+# 4. TUS (neural user sim) + Rule Sys
+# =========================================================================
+def run_tus_rule_sys():
+    import json as _json
+    from convlab.policy.tus.unify.TUS import UserPolicy as TUSPolicy
+    from convlab.policy.rule.multiwoz import RulePolicy
+    from convlab.nlg.template.multiwoz import TemplateNLG
+    from convlab.dialog_agent import PipelineAgent, BiSession
+    from convlab.evaluator.multiwoz_eval import MultiWozEvaluator
+
+    config = _json.load(open("ConvLab-3/convlab/policy/tus/unify/exp/multiwoz.json"))
+    user_policy = TUSPolicy(config, dial_ids_order=0)
+    user_agent = PipelineAgent(None, None, user_policy, None, name="user")
+
+    sys_agent = PipelineAgent(None, CompatRuleDST(), RulePolicy(), None, name="sys")
+    evaluator = MultiWozEvaluator()
+
+    user_nlg = TemplateNLG(is_user=True)
+    sys_nlg = TemplateNLG(is_user=False)
+
+    def _da_to_nl(da, nlg):
+        try:
+            return nlg.generate(da)
+        except Exception:
+            return str(da)
+
+    set_seed(SEED)
+    results = []
+    for i in range(N_DIALOGUES):
+        seed_i = random.randint(1, 100000)
+        random.seed(seed_i)
+        np.random.seed(seed_i)
+
+        sess = BiSession(sys_agent=sys_agent, user_agent=user_agent,
+                         kb_query=None, evaluator=evaluator)
+        sess.init_session()
+
+        sys_response = []
+        conversation = []
+        for t in range(40):
+            sys_response, user_response, session_over, reward = sess.next_turn(sys_response)
+            conversation.append({
+                "turn": t,
+                "user_da": str(user_response),
+                "user_nl": _da_to_nl(user_response, user_nlg),
+                "system_da": str(sys_response),
+                "system_nl": _da_to_nl(sys_response, sys_nlg),
+            })
+            if session_over:
+                break
+
+        task_success = sess.evaluator.task_success()
+        task_complete = sess.evaluator.complete
+        stats = sess.evaluator.inform_F1()
+
+        results.append({
+            "dialogue_id": i,
+            "seed": seed_i,
+            "turns": len(conversation),
+            "completed": bool(task_complete),
+            "success": bool(task_success),
+            "inform_f1": stats[2],
+            "book_rate": sess.evaluator.book_rate(),
+            "conversation": conversation,
+        })
+        print(f"  Dialog {i+1}/{N_DIALOGUES}: turns={len(conversation)} "
+              f"complete={task_complete} success={task_success}")
+
+    return _save(os.path.join(OUT_ROOT, "tus_rule_sys"), "tus_rule_sys", results)
+
+
+# =========================================================================
+# 5. GenTUS (generative neural user sim) + Rule Sys
+# =========================================================================
+def run_gentus_rule_sys():
+    from convlab.policy.genTUS.stepGenTUS import UserPolicy as GenTUSPolicy
+    from convlab.policy.rule.multiwoz import RulePolicy
+    from convlab.nlg.template.multiwoz import TemplateNLG
+    from convlab.dialog_agent import PipelineAgent, BiSession
+    from convlab.evaluator.multiwoz_eval import MultiWozEvaluator
+
+    user_policy = GenTUSPolicy(mode="semantic")
+    user_agent = PipelineAgent(None, None, user_policy, None, name="user")
+
+    sys_agent = PipelineAgent(None, CompatRuleDST(), RulePolicy(), None, name="sys")
+    evaluator = MultiWozEvaluator()
+
+    user_nlg = TemplateNLG(is_user=True)
+    sys_nlg = TemplateNLG(is_user=False)
+
+    def _da_to_nl(da, nlg):
+        try:
+            return nlg.generate(da)
+        except Exception:
+            return str(da)
+
+    set_seed(SEED)
+    results = []
+    for i in range(N_DIALOGUES):
+        seed_i = random.randint(1, 100000)
+        random.seed(seed_i)
+        np.random.seed(seed_i)
+
+        sess = BiSession(sys_agent=sys_agent, user_agent=user_agent,
+                         kb_query=None, evaluator=evaluator)
+        sess.init_session()
+
+        sys_response = []
+        conversation = []
+        for t in range(40):
+            sys_response, user_response, session_over, reward = sess.next_turn(sys_response)
+            conversation.append({
+                "turn": t,
+                "user_da": str(user_response),
+                "user_nl": _da_to_nl(user_response, user_nlg),
+                "system_da": str(sys_response),
+                "system_nl": _da_to_nl(sys_response, sys_nlg),
+            })
+            if session_over:
+                break
+
+        task_success = sess.evaluator.task_success()
+        task_complete = sess.evaluator.complete
+        stats = sess.evaluator.inform_F1()
+
+        results.append({
+            "dialogue_id": i,
+            "seed": seed_i,
+            "turns": len(conversation),
+            "completed": bool(task_complete),
+            "success": bool(task_success),
+            "inform_f1": stats[2],
+            "book_rate": sess.evaluator.book_rate(),
+            "conversation": conversation,
+        })
+        print(f"  Dialog {i+1}/{N_DIALOGUES}: turns={len(conversation)} "
+              f"complete={task_complete} success={task_success}")
+
+    return _save(os.path.join(OUT_ROOT, "gentus_rule_sys"), "gentus_rule_sys", results)
+
+
+# =========================================================================
 # Main
 # =========================================================================
 COMBOS = [
     ("rule_us_rule_sys",  run_rule_us_rule_sys),
+    ("tus_rule_sys",      run_tus_rule_sys),
+    ("gentus_rule_sys",   run_gentus_rule_sys),
     ("llm_us_llm_rg",    run_llm_us_llm_rg),
     ("llm_us_rule_sys",   run_llm_us_rule_sys),
 ]
