@@ -19,7 +19,7 @@ from copy import deepcopy
 from datetime import datetime
 
 SEED = 20200202
-LLM_MODEL = "openrouter/google/gemini-2.0-flash-001"
+LLM_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
 RESULTS_DIR = "experiment_results"
 
 

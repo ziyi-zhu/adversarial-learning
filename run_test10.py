@@ -9,14 +9,23 @@ Combinations:
   3. llm_us_rule_sys      -- LLM user simulator + Rule-based pipeline system
 """
 
-import os, sys, json, random, traceback
+import os, sys, json, random, traceback, logging
 import numpy as np
 from copy import deepcopy
 from datetime import datetime
 
+# Suppress litellm / httpx noise before any imports that pull them in
+os.environ["LITELLM_LOG"] = "ERROR"
+logging.getLogger("LiteLLM").setLevel(logging.ERROR)
+logging.getLogger("litellm").setLevel(logging.ERROR)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+import litellm
+litellm.suppress_debug_info = True
+
 SEED = 42
 N_DIALOGUES = 10
-LLM_MODEL = "openrouter/google/gemini-2.0-flash-001"
+LLM_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
 OUT_ROOT = "experiment_results/test10"
 
 # -- reuse compat DST from run_baselines ---------------------------------
