@@ -105,7 +105,47 @@ def _repair_goal(goal):
 # state format expected by RuleBasedMultiwozBot.
 # ---------------------------------------------------------------------------
 from convlab.dst.dst import DST
-from convlab.util.multiwoz.multiwoz_slot_trans import REF_USR_DA
+from convlab.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
+
+# ---------------------------------------------------------------------------
+# Normalize old-format capitalized system DA → ConvLab-3 lowercase format.
+#
+# RuleBasedMultiwozBot produces DAs like ['Inform','Attraction','Addr','…']
+# but GenTUS / TUS expect              ['inform','attraction','address','…'].
+# ---------------------------------------------------------------------------
+
+# (domain_lower, display_slot) → canonical old slot  (from REF_SYS_DA)
+_SYS_DISPLAY_TO_CANON = {}
+for _d, _sm in REF_SYS_DA.items():
+    for _disp, _canon in _sm.items():
+        if _canon is not None:
+            _SYS_DISPLAY_TO_CANON[(_d.lower(), _disp)] = _canon
+
+# canonical old slot → ConvLab-3 unified slot
+_CANON_TO_UNIFIED = {
+    "pricerange": "price range",
+    "arriveBy": "arrive by",
+    "leaveAt": "leave at",
+    "trainID": "train id",
+    "taxi_types": "type",
+    "taxi_phone": "phone",
+    "Ref": "reference",
+}
+
+
+def _normalize_sys_da(da):
+    """Lowercase domain/intent & map display-slot names to unified names."""
+    if not da:
+        return da
+    out = []
+    for intent, domain, slot, value in da:
+        d = domain.lower()
+        i = intent.lower()
+        s = _SYS_DISPLAY_TO_CANON.get((d, slot), slot)
+        s = _CANON_TO_UNIFIED.get(s, s)
+        out.append([i, d, s, value])
+    return out
+
 
 SLOT_NEW_TO_OLD = {
     "price range": "pricerange",
@@ -372,7 +412,7 @@ def run_tus_rule_sys():
         conversation = []
         for t in range(40):
             sys_response, user_response, session_over, reward = sess.next_turn(
-                sys_response
+                _normalize_sys_da(sys_response)
             )
             conversation.append(
                 {
@@ -462,7 +502,7 @@ def run_gentus_rule_sys():
         conversation = []
         for t in range(40):
             sys_response, user_response, session_over, reward = sess.next_turn(
-                sys_response
+                _normalize_sys_da(sys_response)
             )
             conversation.append(
                 {
