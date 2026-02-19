@@ -64,16 +64,26 @@ def _save(out_dir, combo_name, results, extra_summary=None):
 
 
 # =========================================================================
-# 1. Rule US (semantic) + Rule Sys (semantic)
+# 1. Rule US + Rule Sys (semantic level, with NL post-processing)
 # =========================================================================
 def run_rule_us_rule_sys():
     from convlab.policy.rule.multiwoz import RulePolicy
+    from convlab.nlg.template.multiwoz import TemplateNLG
     from convlab.dialog_agent import PipelineAgent, BiSession
     from convlab.evaluator.multiwoz_eval import MultiWozEvaluator
 
     sys_agent = PipelineAgent(None, CompatRuleDST(), RulePolicy(), None, name="sys")
     user_agent = PipelineAgent(None, None, RulePolicy(character="usr"), None, name="user")
     evaluator = MultiWozEvaluator()
+
+    user_nlg = TemplateNLG(is_user=True)
+    sys_nlg = TemplateNLG(is_user=False)
+
+    def _da_to_nl(da, nlg):
+        try:
+            return nlg.generate(da)
+        except Exception:
+            return str(da)
 
     set_seed(SEED)
     results = []
@@ -90,7 +100,13 @@ def run_rule_us_rule_sys():
         conversation = []
         for t in range(40):
             sys_response, user_response, session_over, reward = sess.next_turn(sys_response)
-            conversation.append({"turn": t, "user": str(user_response), "system": str(sys_response)})
+            conversation.append({
+                "turn": t,
+                "user_da": str(user_response),
+                "user_nl": _da_to_nl(user_response, user_nlg),
+                "system_da": str(sys_response),
+                "system_nl": _da_to_nl(sys_response, sys_nlg),
+            })
             if session_over:
                 break
 

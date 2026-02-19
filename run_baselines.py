@@ -49,9 +49,9 @@ SLOT_NEW_TO_OLD = {
     "book people": "people",
     "book stay": "stay",
     "book time": "time",
+    "train id": "trainID",
+    "entrance fee": "entrance fee",
 }
-
-BOOK_SLOTS = {"day", "people", "stay", "time"}
 
 # ConvLab-3 slot name -> display name expected by the system bot in user_action
 _SLOT_DISPLAY = {}
@@ -80,6 +80,19 @@ class CompatRuleDST(DST):
     def init_session(self):
         self._init_state()
 
+    def _place_slot(self, dom, old_slot, value):
+        """Route slot to the correct sub-dict (book vs semi) by checking the
+        actual state structure for this domain, not a global set."""
+        bs = self.state["belief_state"].get(dom)
+        if not bs or old_slot in ("none", ""):
+            return
+        book = bs.get("book", {})
+        semi = bs.get("semi", {})
+        if old_slot in book and old_slot != "booked":
+            book[old_slot] = value
+        elif old_slot in semi:
+            semi[old_slot] = value
+
     def update(self, user_act=None):
         if not user_act:
             return self.state
@@ -91,13 +104,7 @@ class CompatRuleDST(DST):
             display_slot = _to_display_slot(dom, slot)
 
             if intent == "inform" and dom in self.state["belief_state"]:
-                if old_slot not in ("none", ""):
-                    if old_slot in BOOK_SLOTS and "book" in self.state["belief_state"][dom]:
-                        if old_slot in self.state["belief_state"][dom]["book"]:
-                            self.state["belief_state"][dom]["book"][old_slot] = value
-                    elif "semi" in self.state["belief_state"][dom]:
-                        if old_slot in self.state["belief_state"][dom]["semi"]:
-                            self.state["belief_state"][dom]["semi"][old_slot] = value
+                self._place_slot(dom, old_slot, value)
             elif intent == "request":
                 if dom not in self.state["request_state"]:
                     self.state["request_state"][dom] = {}

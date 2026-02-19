@@ -1,5 +1,0 @@
-combo: rule_us_rule_sys
-n_dialogues: 10
-completion_rate: 0.5000
-success_rate: 0.2000
-avg_turns: 13.8000
