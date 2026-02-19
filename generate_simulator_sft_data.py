@@ -19,7 +19,7 @@ from convlab.base_models.llm.user_simulator import LLM_US
 from datasets import Dataset
 
 INITIAL_SYSTEM_GREETING = "Hello, how may I help you today?"
-HF_REPO = "slingshot/multiwoz-2.1-convlab"
+HF_REPO = "slingshot/multiwoz-2.1-user-sim-sft"
 
 
 def _repair_description(description):

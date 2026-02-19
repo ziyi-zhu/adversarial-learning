@@ -39,6 +39,32 @@ SEED = 42
 N_DIALOGUES = 10
 LLM_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
 OUT_ROOT = "experiment_results"
+CACHE_DIR = "cache"
+
+
+def _sanitize(name):
+    return name.replace("/", "_").replace(" ", "_")
+
+
+def _cache_path(combo, model=None):
+    parts = [CACHE_DIR, "baselines", combo]
+    if model:
+        parts.append(_sanitize(model))
+    return os.path.join(*parts)
+
+
+def _load_cached(cache_dir, idx):
+    path = os.path.join(cache_dir, f"dialog_{idx}.json")
+    if os.path.exists(path):
+        with open(path) as f:
+            return json.load(f)
+    return None
+
+
+def _save_to_cache(cache_dir, idx, data):
+    os.makedirs(cache_dir, exist_ok=True)
+    with open(os.path.join(cache_dir, f"dialog_{idx}.json"), "w") as f:
+        json.dump(data, f, indent=2, default=str)
 
 
 def set_seed(seed):
@@ -210,6 +236,8 @@ def run_rule_us_rule_sys():
     from convlab.nlg.template.multiwoz import TemplateNLG
     from convlab.policy.rule.multiwoz import RulePolicy
 
+    cdir = _cache_path("rule_us_rule_sys")
+
     sys_agent = PipelineAgent(None, CompatRuleDST(), RulePolicy(), None, name="sys")
     user_agent = PipelineAgent(
         None, None, RulePolicy(character="usr"), None, name="user"
@@ -228,6 +256,11 @@ def run_rule_us_rule_sys():
     set_seed(SEED)
     results = []
     for i in range(N_DIALOGUES):
+        cached = _load_cached(cdir, i)
+        if cached:
+            results.append(cached)
+            continue
+
         seed_i = random.randint(1, 100000)
         random.seed(seed_i)
         np.random.seed(seed_i)
@@ -262,18 +295,18 @@ def run_rule_us_rule_sys():
         task_complete = sess.evaluator.complete
         stats = sess.evaluator.inform_F1()
 
-        results.append(
-            {
-                "dialogue_id": i,
-                "seed": seed_i,
-                "turns": len(conversation),
-                "completed": bool(task_complete),
-                "success": bool(task_success),
-                "inform_f1": stats[2],
-                "book_rate": sess.evaluator.book_rate(),
-                "conversation": conversation,
-            }
-        )
+        result = {
+            "dialogue_id": i,
+            "seed": seed_i,
+            "turns": len(conversation),
+            "completed": bool(task_complete),
+            "success": bool(task_success),
+            "inform_f1": stats[2],
+            "book_rate": sess.evaluator.book_rate(),
+            "conversation": conversation,
+        }
+        _save_to_cache(cdir, i, result)
+        results.append(result)
         if (i + 1) % 50 == 0 or i == N_DIALOGUES - 1:
             print(
                 f"  Dialog {i + 1}/{N_DIALOGUES}: turns={len(conversation)} "
@@ -297,6 +330,8 @@ def run_tus_rule_sys():
     from convlab.policy.rule.multiwoz import RulePolicy
     from convlab.policy.tus.unify.TUS import UserPolicy as TUSPolicy
 
+    cdir = _cache_path("tus_rule_sys")
+
     config = _json.load(open("ConvLab-3/convlab/policy/tus/unify/exp/multiwoz.json"))
     user_policy = TUSPolicy(config, dial_ids_order=0)
     user_agent = PipelineAgent(None, None, user_policy, None, name="user")
@@ -316,6 +351,11 @@ def run_tus_rule_sys():
     set_seed(SEED)
     results = []
     for i in range(N_DIALOGUES):
+        cached = _load_cached(cdir, i)
+        if cached:
+            results.append(cached)
+            continue
+
         seed_i = random.randint(1, 100000)
         random.seed(seed_i)
         np.random.seed(seed_i)
@@ -350,18 +390,18 @@ def run_tus_rule_sys():
         task_complete = sess.evaluator.complete
         stats = sess.evaluator.inform_F1()
 
-        results.append(
-            {
-                "dialogue_id": i,
-                "seed": seed_i,
-                "turns": len(conversation),
-                "completed": bool(task_complete),
-                "success": bool(task_success),
-                "inform_f1": stats[2],
-                "book_rate": sess.evaluator.book_rate(),
-                "conversation": conversation,
-            }
-        )
+        result = {
+            "dialogue_id": i,
+            "seed": seed_i,
+            "turns": len(conversation),
+            "completed": bool(task_complete),
+            "success": bool(task_success),
+            "inform_f1": stats[2],
+            "book_rate": sess.evaluator.book_rate(),
+            "conversation": conversation,
+        }
+        _save_to_cache(cdir, i, result)
+        results.append(result)
         if (i + 1) % 50 == 0 or i == N_DIALOGUES - 1:
             print(
                 f"  Dialog {i + 1}/{N_DIALOGUES}: turns={len(conversation)} "
@@ -381,6 +421,8 @@ def run_gentus_rule_sys():
     from convlab.policy.genTUS.stepGenTUS import UserPolicy as GenTUSPolicy
     from convlab.policy.rule.multiwoz import RulePolicy
 
+    cdir = _cache_path("gentus_rule_sys")
+
     user_policy = GenTUSPolicy(mode="semantic")
     user_agent = PipelineAgent(None, None, user_policy, None, name="user")
 
@@ -399,6 +441,11 @@ def run_gentus_rule_sys():
     set_seed(SEED)
     results = []
     for i in range(N_DIALOGUES):
+        cached = _load_cached(cdir, i)
+        if cached:
+            results.append(cached)
+            continue
+
         seed_i = random.randint(1, 100000)
         random.seed(seed_i)
         np.random.seed(seed_i)
@@ -433,18 +480,18 @@ def run_gentus_rule_sys():
         task_complete = sess.evaluator.complete
         stats = sess.evaluator.inform_F1()
 
-        results.append(
-            {
-                "dialogue_id": i,
-                "seed": seed_i,
-                "turns": len(conversation),
-                "completed": bool(task_complete),
-                "success": bool(task_success),
-                "inform_f1": stats[2],
-                "book_rate": sess.evaluator.book_rate(),
-                "conversation": conversation,
-            }
-        )
+        result = {
+            "dialogue_id": i,
+            "seed": seed_i,
+            "turns": len(conversation),
+            "completed": bool(task_complete),
+            "success": bool(task_success),
+            "inform_f1": stats[2],
+            "book_rate": sess.evaluator.book_rate(),
+            "conversation": conversation,
+        }
+        _save_to_cache(cdir, i, result)
+        results.append(result)
         if (i + 1) % 50 == 0 or i == N_DIALOGUES - 1:
             print(
                 f"  Dialog {i + 1}/{N_DIALOGUES}: turns={len(conversation)} "
@@ -460,12 +507,19 @@ def run_gentus_rule_sys():
 def run_llm_us_llm_rg():
     from convlab.base_models.llm.user_simulator import LLM_RG, LLM_US
 
+    cdir = _cache_path("llm_us_llm_rg", LLM_MODEL)
+
     goals = _load_test_goals()
     user_model = LLM_US("litellm", LLM_MODEL)
     system_model = LLM_RG("litellm", LLM_MODEL)
 
     results = []
     for i, goal in enumerate(goals):
+        cached = _load_cached(cdir, i)
+        if cached:
+            results.append(cached)
+            continue
+
         if (i + 1) % 10 == 0 or i == 0:
             print(f"  Dialog {i + 1}/{len(goals)} ...")
         try:
@@ -495,17 +549,17 @@ def run_llm_us_llm_rg():
             print(f"    Error: {e}")
             completed, reward, conversation, turns = False, None, [], 0
 
-        results.append(
-            {
-                "dialogue_id": i,
-                "goal_description": goal.get("description", ""),
-                "turns": turns,
-                "completed": completed,
-                "success": completed,
-                "reward": reward,
-                "conversation": conversation,
-            }
-        )
+        result = {
+            "dialogue_id": i,
+            "goal_description": goal.get("description", ""),
+            "turns": turns,
+            "completed": completed,
+            "success": completed,
+            "reward": reward,
+            "conversation": conversation,
+        }
+        _save_to_cache(cdir, i, result)
+        results.append(result)
 
     return _save(
         os.path.join(OUT_ROOT, "llm_us_llm_rg"),
@@ -526,6 +580,8 @@ def run_llm_us_rule_sys():
     from convlab.policy.rule.multiwoz import RulePolicy
     from convlab.util.unified_datasets_util import load_dataset
 
+    cdir = _cache_path("llm_us_rule_sys", LLM_MODEL)
+
     dataset = load_dataset("multiwoz21")
     example_dialogs = dataset["train"][:3]
     goals = _load_test_goals()
@@ -538,6 +594,11 @@ def run_llm_us_rule_sys():
 
     results = []
     for i, goal in enumerate(goals):
+        cached = _load_cached(cdir, i)
+        if cached:
+            results.append(cached)
+            continue
+
         if (i + 1) % 10 == 0 or i == 0:
             print(f"  Dialog {i + 1}/{len(goals)} ...")
         try:
@@ -568,17 +629,17 @@ def run_llm_us_rule_sys():
             traceback.print_exc()
             completed, reward, conversation, turns = False, None, [], 0
 
-        results.append(
-            {
-                "dialogue_id": i,
-                "goal_description": goal.get("description", ""),
-                "turns": turns,
-                "completed": completed,
-                "success": completed,
-                "reward": reward,
-                "conversation": conversation,
-            }
-        )
+        result = {
+            "dialogue_id": i,
+            "goal_description": goal.get("description", ""),
+            "turns": turns,
+            "completed": completed,
+            "success": completed,
+            "reward": reward,
+            "conversation": conversation,
+        }
+        _save_to_cache(cdir, i, result)
+        results.append(result)
 
     return _save(
         os.path.join(OUT_ROOT, "llm_us_rule_sys"),
