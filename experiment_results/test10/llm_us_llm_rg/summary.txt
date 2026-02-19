@@ -1,0 +1,6 @@
+combo: llm_us_llm_rg
+n_dialogues: 10
+completion_rate: 0.9000
+success_rate: 0.9000
+avg_turns: 7.7000
+model: openrouter/google/gemini-2.0-flash-001

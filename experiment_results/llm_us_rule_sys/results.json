@@ -1,0 +1,1867 @@
+{
+  "summary": {
+    "model": "openrouter/google/gemini-2.0-flash-001",
+    "total_dialogs": 20,
+    "completed_rate": 0.75,
+    "avg_turns": 9.6,
+    "avg_reward": 40.0
+  },
+  "dialogs": [
+    {
+      "dialogue_id": 0,
+      "goal_description": "You are looking for information in Cambridge. You are looking for a <span class='emphasis'>place to stay</span>. The hotel should have <span class='emphasis'>a star of 4</span> and should be in the <span class='emphasis'>east</span>. The hotel should <span class='emphasis'>include free wifi</span> and should <span class='emphasis'>include free parking</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>3 people</span> and <span class='emphasis'>4 nights</span> starting from <span class='emphasis'>monday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for a <span class='emphasis'>train</span>. The train should depart from <span class='emphasis'>cambridge</span> and should leave on <span class='emphasis'>friday</span>. The train should <span class='emphasis'>arrive by 19:45</span> and should go to <span class='emphasis'>bishops stortford</span>. Make sure you get <span class='emphasis'>travel time</span>, <span class='emphasis'>departure time</span>, and <span class='emphasis'>price</span>",
+      "turns": 20,
+      "completed": false,
+      "reward": null,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for a place to stay in Cambridge.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I ' m sorry , no , none in the cambridge ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, I am looking for a hotel that has a star of 4 and is in the east. It should include free wifi and free parking."
+        },
+        {
+          "role": "assistant",
+          "content": "There are 5 of those . Will warkworth house be alright ? This is an moderate hotel ."
+        },
+        {
+          "role": "user",
+          "content": "Yes, that sounds great. Can you book it for 3 people for 4 nights starting on Monday?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "All set . Your reference number is 00000003 ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, great. I am also looking for a train."
+        },
+        {
+          "role": "assistant",
+          "content": "Departure time in mind ? What time would you like to arrive by ? Can you tell me what day you would like to travel ? What station would you like to arrive at ? Where will you be departing from ?"
+        },
+        {
+          "role": "user",
+          "content": "The train should depart from cambridge and should leave on Friday, arriving by 19:45 in bishops stortford.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me which day you 'd like to travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "I want to travel on Friday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me which day you 'd like to travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday!\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "FRIDAY!\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday!\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday!\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday!\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel , please ?"
+        },
+        {
+          "role": "user",
+          "content": "FRIDAY!\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day did you have in mind ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "All set . Your reference number is 00000003 ."
+        },
+        {
+          "role": "user",
+          "content": "I already booked a hotel. I am now looking for a train. The train should depart from Cambridge and should leave on Friday, arriving by 19:45 in Bishops Stortford.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me which day you 'd like to travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday!\n"
+        },
+        {
+          "role": "assistant",
+          "content": "On what day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday!\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday."
+        },
+        {
+          "role": "assistant",
+          "content": "On what day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday!"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 1,
+      "goal_description": "You are planning your trip in Cambridge. You are looking for a <span class='emphasis'>train</span>. The train should <span class='emphasis'>leave after 18:45</span> and should go to <span class='emphasis'>cambridge</span>. The train should leave on <span class='emphasis'>wednesday</span> and should depart from <span class='emphasis'>norwich</span>. Once you find the train you want to make a booking for <span class='emphasis'>1 people</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for <span class='emphasis'>places to go</span> in town. The attraction should be in the <span class='emphasis'>east</span> and should be in the type of <span class='emphasis'>mutliple sports</span>. Make sure you get <span class='emphasis'>phone number</span> and <span class='emphasis'>postcode</span>",
+      "turns": 20,
+      "completed": false,
+      "reward": null,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am planning my trip to Cambridge on Wednesday and I need your help. I need to book a train.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "When would you like to travel ? What day did you have in mind ? Where would you like your train to take you ? Where are you departing from ?"
+        },
+        {
+          "role": "user",
+          "content": "I need to travel on Wednesday from Norwich to Cambridge and I want to leave after 18:45.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "I will be travelling on wednesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday\n"
+        },
+        {
+          "role": "assistant",
+          "content": "On what day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day did you have in mind ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday."
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me which day you 'd like to travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me which day you 'd like to travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel , please ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "wednesday."
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you be traveling ?"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 2,
+      "goal_description": "You are looking for information in Cambridge. You are looking for a <span class='emphasis'>particular restaurant</span>. Its name is called <span class='emphasis'>riverside brasserie</span>. Once you find the <span class='emphasis'>restaurant</span> you want to book a table for <span class='emphasis'>6 people</span> at <span class='emphasis'>14:30</span> on <span class='emphasis'>sunday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for a <span class='emphasis'>place to stay</span>. The hotel should be in the <span class='emphasis'>south</span> and should be in the type of <span class='emphasis'>hotel</span>. The hotel should have <span class='emphasis'>a star of 4</span>. If there is no such hotel, how about one that is in <span class='emphasis'>the type of guesthouse</span>. Make sure you get <span class='emphasis'>postcode</span>",
+      "turns": 16,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for a restaurant in Cambridge called riverside brasserie. Can you help me find it and book a table?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I ' m sorry . i can not find details for riverside brasserie . There are none in cambridge of town ."
+        },
+        {
+          "role": "user",
+          "content": "Okay. Can you find me a place to stay in the south of Cambridge? It should be a 4-star hotel."
+        },
+        {
+          "role": "assistant",
+          "content": "I have 2 different options for you !. Would rosa's bed and breakfast work for you ? They have a 4 Star rating."
+        },
+        {
+          "role": "user",
+          "content": "Is rosa's bed and breakfast in the type of hotel? if not, I would prefer a guesthouse. Also, could you provide the postcode?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "The postal code for that hotel is cb17sr . There are 2 of those . Rosa's bed and breakfast looks like it would be a good choice . They have free parking . Its listed as cheap ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, I will book a table for 6 people at 14:30 on Sunday at the riverside brasserie if you can find it. then make the hotel booking.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "There are 2 of those . Everyone seems to enjoy the rosa's bed and breakfast . I ' m sorry . i can not find details for riverside brasserie . I have n't found any in the cambridge. I ' m sorry . i can not find details for riverside brasserie . There no such restraunts in cambridge."
+        },
+        {
+          "role": "user",
+          "content": "Okay, can you book a table for 6 at 14:30 on Sunday at any other restaurant?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I ' m sorry . i can not find details for riverside brasserie . I am sorry there are no restaurants in cambridge that match that description ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, let's forget about the restaurant then. Please book Rosa's bed and breakfast for me.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "How about rosa's bed and breakfast ? It is rated 4 stars , is that okay ? It offers free parking . It is a guesthouse . It is in the cheap price range . It has free wifi ."
+        },
+        {
+          "role": "user",
+          "content": "Yes, that sounds perfect! Can you please book it for me? And could you confirm the postcode again?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Okay , how about rosa's bed and breakfast ? They have free parking . Its listed as cheap . It does have 4 stars . It has free wifi . It is a guesthouse . They are located in the south . Their postcode is cb22ha."
+        },
+        {
+          "role": "user",
+          "content": "Great, please proceed with the booking.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "It is rated 4 stars ,. It has wifi ."
+        },
+        {
+          "role": "user",
+          "content": "Please book it.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "The hotel is 4 stars . Internet is available ."
+        },
+        {
+          "role": "user",
+          "content": "Yes, please book it for me. Can you book it, or not?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "It has free wifi . It is in the south area . It has 4 stars . This is an cheap hotel . It is a guesthouse ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, please book it for me.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Rosa's bed and breakfast is available would you like to try that ? It is indeed in the south . It is a guesthouse . Its listed as cheap . There is wifi available at the hotel . It has a rating of 4 stars . It offers free parking ."
+        },
+        {
+          "role": "user",
+          "content": "Yes, please book it for me.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "It is a guesthouse ."
+        },
+        {
+          "role": "user",
+          "content": "Please confirm that you are booking Rosa's bed and breakfast for me.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "The parking is free ."
+        },
+        {
+          "role": "user",
+          "content": "Are you able to book the guesthouse for me or not?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "It is in the south area . It is a guesthouse . The place provides free wifi ."
+        },
+        {
+          "role": "user",
+          "content": "Please tell me if you are able to book Rosa's bed and breakfast for me or not? It's in the south, a guesthouse, has wifi, and 4 stars. Are you able to book it?\n"
+        },
+        {
+          "role": "assistant",
+          "content": ""
+        },
+        {
+          "role": "user",
+          "content": "\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I ' m happy to have been able to help you today ."
+        },
+        {
+          "role": "user",
+          "content": "Thank you! **[END]**"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 3,
+      "goal_description": "You are looking for information in Cambridge. You are looking for a <span class='emphasis'>particular hotel</span>. Its name is called <span class='emphasis'>express by holiday inn cambridge</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>7 people</span> and <span class='emphasis'>4 nights</span> starting from <span class='emphasis'>monday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for a <span class='emphasis'>train</span>. The train should go to <span class='emphasis'>birmingham new street</span> and should <span class='emphasis'>arrive by 17:30</span>. The train should leave on <span class='emphasis'>friday</span> and should depart from <span class='emphasis'>cambridge</span>. Make sure you get <span class='emphasis'>travel time</span>",
+      "turns": 9,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for a hotel in Cambridge. It's called express by holiday inn cambridge.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I am not finding anything for express by holiday inn cambridge that suit your needs. Sorry there are none in the cambridge ."
+        },
+        {
+          "role": "user",
+          "content": "Oh, okay. Could you check if there is just a hotel called express by holiday inn in cambridge?"
+        },
+        {
+          "role": "assistant",
+          "content": "Express by holiday inn is not available . There are none in the cambridge . Perhaps another criteria change ?"
+        },
+        {
+          "role": "user",
+          "content": "Okay, then find the express by holiday inn cambridge."
+        },
+        {
+          "role": "assistant",
+          "content": "I am not finding anything for express by holiday inn cambridge that suit your needs. Sorry there are none in the cambridge ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, can you book express by holiday inn cambridge for 7 people for 4 nights starting on monday?"
+        },
+        {
+          "role": "assistant",
+          "content": "Express by holiday inn cambridge is not available . There are none in the cambridge . Perhaps another criteria change ?"
+        },
+        {
+          "role": "user",
+          "content": "Okay, I will proceed with the booking if you find it. Starting monday for 4 nights and 7 people."
+        },
+        {
+          "role": "assistant",
+          "content": "I am not finding anything for express by holiday inn cambridge that suit your needs. There are none in the cambridge . Perhaps another criteria change ?"
+        },
+        {
+          "role": "user",
+          "content": "Okay, in that case, I am also looking for a train to birmingham new street that arrives by 17:30. The train should leave on friday and should depart from cambridge."
+        },
+        {
+          "role": "assistant",
+          "content": "On what day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Friday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the booking information : Booking was successful . Reference number is : 00000000."
+        },
+        {
+          "role": "user",
+          "content": "What is the travel time?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "The trip is 163 minutes ."
+        },
+        {
+          "role": "user",
+          "content": "Thank you! **[END]**\n"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 4,
+      "goal_description": "You are traveling to Cambridge and excited about seeing local tourist attractions. You are looking for a <span class='emphasis'>place to stay</span>. The hotel should <span class='emphasis'>include free wifi</span> and should be in the <span class='emphasis'>expensive</span> price range. The hotel should be in the type of <span class='emphasis'>guesthouse</span> and should be in the <span class='emphasis'>east</span>. If there is no such hotel, how about one that is in the <span class='emphasis'>cheap</span> price range. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>3 people</span> and <span class='emphasis'>2 nights</span> starting from <span class='emphasis'>tuesday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for <span class='emphasis'>places to go</span> in town. The attraction should be in the type of <span class='emphasis'>architecture</span> and should be in the <span class='emphasis'>centre</span>. Make sure you get <span class='emphasis'>postcode</span>",
+      "turns": 7,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am planning a trip to Cambridge and need to find a place to stay. I'd like to find a guesthouse in the east that includes free wifi and is in the expensive price range.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I have nothing in the east . Can I try something else ? There is none that is expensive . Would you like to change your criteria ? There are not any with wifi . There are no guesthouse that meet that criteria , would you like information about the hotel options ?"
+        },
+        {
+          "role": "user",
+          "content": "How about a cheap guesthouse instead?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I have 3 options for you. How about allenbell ? It has all the attributes you requested and a great name !. It has wifi ."
+        },
+        {
+          "role": "user",
+          "content": "Sounds great! Please book it for 3 people for 2 nights starting on Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Reference number is : 00000003 ."
+        },
+        {
+          "role": "user",
+          "content": "Perfect, what is the reference number?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Thank you for contacting us and have a nice day ."
+        },
+        {
+          "role": "user",
+          "content": "I have a reference number of 00000003.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I have 110 options for you !. I would suggest grafton hotel restaurant . The reference number is 00000084 ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, I have my hotel sorted. Now I am looking for tourist attractions. I'm interested in architecture in the centre.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I ' ve found 5 places for you to go . Do you have any specific ideas in mind ? I would suggest little saint mary's church ."
+        },
+        {
+          "role": "user",
+          "content": "Great, can you give me the postcode for Little Saint Mary's Church?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What about little saint mary's church ? Its postcode is cb21qy . It is a architecture ."
+        },
+        {
+          "role": "user",
+          "content": "That's exactly what I was looking for! Thank you so much for your help! **[END]**\n"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 5,
+      "goal_description": "You are looking for information in Cambridge. You are looking for <span class='emphasis'>places to go</span> in town. The attraction should be in the <span class='emphasis'>centre</span> and should be in the type of <span class='emphasis'>entertainment</span>. If there is no such attraction, how about one that is in <span class='emphasis'>the type of boat</span>. Make sure you get <span class='emphasis'>address</span> and <span class='emphasis'>entrance fee</span>. You are also looking for a <span class='emphasis'>place to stay</span>. The hotel should be in the type of <span class='emphasis'>guesthouse</span> and should be in the <span class='emphasis'>moderate</span> price range. The hotel should have <span class='emphasis'>a star of 3</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>2 people</span> and <span class='emphasis'>2 nights</span> starting from <span class='emphasis'>saturday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You also want to book a <span class='emphasis'>taxi</span> to commute between the two places. You want to leave the <span class='emphasis'>attraction</span> by <span class='emphasis'>08:00</span>. Make sure you get <span class='emphasis'>contact number</span> and <span class='emphasis'>car type</span>",
+      "turns": 5,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I'm looking for places to go in Cambridge, specifically entertainment venues in the centre. Could you help me with that?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Unfortunately there are no entertainment venues in that location . I ' m sorry , I could n't find anything like that in the centre ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, how about a boat tour then, also in the centre? I also need the address and entrance fee.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Unfortunately I can not find anything strictly categorized as boat tour in that area can you provide more specifications ? I ' m sorry , I could n't find anything like that in the centre . There are no boat tour in this area . I am sorry , I am unable to locate an attraction in centre ?"
+        },
+        {
+          "role": "user",
+          "content": "Okay, that's a shame. I'm also looking for a place to stay. I need a guesthouse with a 3-star rating and a moderate price range."
+        },
+        {
+          "role": "assistant",
+          "content": "I have 4 different options for you !. I would suggest alpha-milton guest house."
+        },
+        {
+          "role": "user",
+          "content": "Great! Could you book it for 2 people for 2 nights starting on Saturday? I need the reference number after booking."
+        },
+        {
+          "role": "assistant",
+          "content": "Reference number is : 00000004 ."
+        },
+        {
+          "role": "user",
+          "content": "Perfect. Finally, I need a taxi to go from the attraction to the guesthouse leaving the attraction by 8:00. I need the contact number and car type for the taxi."
+        },
+        {
+          "role": "assistant",
+          "content": "It will be a tesla . The contact is 58563503012 . It will be a tesla . You can give them a call at 86892749318."
+        },
+        {
+          "role": "user",
+          "content": "Thank you so much for your help!\n\n[END]\n"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 6,
+      "goal_description": "You are looking for information in Cambridge. You are looking for a <span class='emphasis'>place to stay</span>. The hotel should <span class='emphasis'>include free wifi</span> and should be in the <span class='emphasis'>moderate</span> price range. The hotel should be in the <span class='emphasis'>south</span> and should have <span class='emphasis'>a star of 4</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>4 people</span> and <span class='emphasis'>2 nights</span> starting from <span class='emphasis'>sunday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for a <span class='emphasis'>train</span>. The train should <span class='emphasis'>arrive by 10:45</span> and should depart from <span class='emphasis'>peterborough</span>. The train should go to <span class='emphasis'>cambridge</span> and should be on <span class='emphasis'>the same day as the hotel booking</span>. Make sure you get <span class='emphasis'>price</span> and <span class='emphasis'>travel time</span>",
+      "turns": 20,
+      "completed": false,
+      "reward": null,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for a place to stay in Cambridge. It should include free wifi.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I have nothing in the cambridge . Can I try something else ? There are not any with wifi ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, let's try again. I am looking for a place to stay in the south part of Cambridge with a 4-star rating and free wifi. It should be in the moderate price range.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "It is in the south part of town . It is a moderate place . It is a guesthouse ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, that sounds promising. What is the name of the hotel?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "How about aylesbray lodge guest house ?"
+        },
+        {
+          "role": "user",
+          "content": "Yes, that sounds good. Can you book it for 4 people for 2 nights starting on Sunday?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "All set . Your reference number is 00000010 ."
+        },
+        {
+          "role": "user",
+          "content": "Great, thank you! Now I am also looking for a train. I need a train to Cambridge that arrives by 10:45, departing from Peterborough on the same day as the hotel booking.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday, the same day as the hotel booking.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday, the same day as the hotel booking.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day did you have in mind ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day did you have in mind ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day did you have in mind ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday. Could you please look for a train arriving by 10:45 in Cambridge departing from Peterborough on Sunday?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday."
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday. \n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday."
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me which day you 'd like to travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me which day you 'd like to travel on ?"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 7,
+      "goal_description": "You are looking for a <span class='emphasis'>place to stay</span>. The hotel should <span class='emphasis'>include free wifi</span> and should have <span class='emphasis'>a star of 3</span>. The hotel should be in the type of <span class='emphasis'>hotel</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>3 people</span> and <span class='emphasis'>2 nights</span> starting from <span class='emphasis'>monday</span>. Make sure you get the <span class='emphasis'>reference number</span>",
+      "turns": 5,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for a place to stay.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Yes it does."
+        },
+        {
+          "role": "user",
+          "content": "It should include free wifi and a star of 3.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I have 5 different options for you !. How about bridge guest house ? It has all the attributes you requested and a great name !. Its listed as moderate ."
+        },
+        {
+          "role": "user",
+          "content": "Is it a hotel?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "It is a guesthouse ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, can you find me a hotel instead?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "There are 2 of those . How about the lensfield hotel ? Fits your request perfectly . It is in the south ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, I want to book it for 3 people and 2 nights starting from monday."
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the booking information : Booking was successful . Reference number is : 00000018."
+        },
+        {
+          "role": "user",
+          "content": "Thank you! [END]\n"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 8,
+      "goal_description": "You are traveling to Cambridge and looking forward to try local restaurants. You are looking for a <span class='emphasis'>restaurant</span>. The restaurant should be in the <span class='emphasis'>centre</span> and should serve <span class='emphasis'>italian</span> food. Make sure you get <span class='emphasis'>phone number</span>, <span class='emphasis'>postcode</span>, and <span class='emphasis'>address</span>. You are also looking for <span class='emphasis'>places to go</span> in town. The attraction should be in the type of <span class='emphasis'>college</span>. Make sure you get <span class='emphasis'>entrance fee</span>, <span class='emphasis'>postcode</span>, and <span class='emphasis'>address</span>",
+      "turns": 4,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for a restaurant in the centre. It should serve Italian food."
+        },
+        {
+          "role": "assistant",
+          "content": "There are 9 available restaurants . I would suggest zizzi cambridge ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, can you give me the phone number, postcode, and address?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "The restaurant's phone number is 01223323737 . The restaurant postcode is cb21ab . The restaurant address is Regent Street City Centre ."
+        },
+        {
+          "role": "user",
+          "content": "Great, I am also looking for places to go in town. I'd like to visit a college.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Sure , there are 18 for you to choose from . How about hughes hall ? they 're pretty fun . Here is the attraction phone number , 01223334898 ."
+        },
+        {
+          "role": "user",
+          "content": "Can you provide the entrance fee, postcode, and address for Hughes Hall?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Their entrance fee is free by our system currently . The postcode of the attraction is cb23bu . The address is saint andrew's street ."
+        },
+        {
+          "role": "user",
+          "content": "Thank you for the information! **[END]**\n"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 9,
+      "goal_description": "You are planning your trip in Cambridge. You are looking for a <span class='emphasis'>train</span>. The train should depart from <span class='emphasis'>cambridge</span> and should <span class='emphasis'>leave after 10:00</span>. The train should go to <span class='emphasis'>birmingham new street</span> and should leave on <span class='emphasis'>thursday</span>. Once you find the train you want to make a booking for <span class='emphasis'>6 people</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for a <span class='emphasis'>particular attraction</span>. Its name is called <span class='emphasis'>abbey pool and astroturf pitch</span>. Make sure you get <span class='emphasis'>address</span> and <span class='emphasis'>phone number</span>",
+      "turns": 20,
+      "completed": false,
+      "reward": null,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am planning a trip to Cambridge. I need a train.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What time do you want to depart ? Can you confirm your desired travel day ? Where will you be traveling from ?"
+        },
+        {
+          "role": "user",
+          "content": "I want to depart from Cambridge on Thursday and leave after 10:00. I am going to Birmingham New Street.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel , please ?"
+        },
+        {
+          "role": "user",
+          "content": "I want to travel on Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "I already said I want to travel on Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me which day you 'd like to travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "I want to travel on Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday."
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day did you have in mind ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "I want to travel on Thursday."
+        },
+        {
+          "role": "assistant",
+          "content": "On what day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "On what day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "I want to travel on Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "I want to travel on Thursday."
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Thursday."
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel , please ?"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 10,
+      "goal_description": "You are traveling to Cambridge and looking forward to try local restaurants. You are looking for a <span class='emphasis'>place to dine</span>. The restaurant should serve <span class='emphasis'>modern global</span> food and should be in the <span class='emphasis'>expensive</span> price range. If there is no such restaurant, how about one that serves <span class='emphasis'>chinese</span> food. Make sure you get <span class='emphasis'>postcode</span>. You are also looking for a <span class='emphasis'>particular hotel</span>. Its name is called <span class='emphasis'>home from home</span>. Make sure you get <span class='emphasis'>address</span>, <span class='emphasis'>whether they have free parking</span>, and <span class='emphasis'>whether they have internet</span>",
+      "turns": 4,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for a place to dine in Cambridge.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I did not find any restaurants in Cambridge ."
+        },
+        {
+          "role": "user",
+          "content": "OK. Then I am looking for a restaurant serving modern global food in the expensive price range."
+        },
+        {
+          "role": "assistant",
+          "content": "I do not have anything in that price range for modern global . Another criteria perhaps ? No expensive restaurant. Sorry , there are no restaurants like that in the cambridge ."
+        },
+        {
+          "role": "user",
+          "content": "How about chinese food then? Could you give me the postcode?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I am unable to find any chinese restaurants in town . There are none in expensive , perhaps something else ? Sorry , there are no restaurants like that in the cambridge . There are no chinese restaurants unfortunately . There are none in expensive , perhaps something else ? I have n't found any in the cambridge."
+        },
+        {
+          "role": "user",
+          "content": "OK. Then could you help me find a hotel? I am looking for a particular hotel called home from home. I need the address, if they have free parking, and if they have internet.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Does the home from home work ? They have free parking . They have a 4 Star rating. They are located at 78-80 milton road. It does include free parking . The wifi is included ."
+        },
+        {
+          "role": "user",
+          "content": "Perfect! Thank you. [END]\n"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 11,
+      "goal_description": "You are traveling to Cambridge and looking forward to try local restaurants. You are looking for a <span class='emphasis'>place to stay</span>. The hotel should <span class='emphasis'>include free parking</span> and should have <span class='emphasis'>a star of 3</span>. The hotel should be in the <span class='emphasis'>expensive</span> price range and should be in the <span class='emphasis'>south</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>3 people</span> and <span class='emphasis'>5 nights</span> starting from <span class='emphasis'>friday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for a <span class='emphasis'>place to dine</span>. The restaurant should serve <span class='emphasis'>mexican</span> food and should be <span class='emphasis'>in the same area as the hotel</span>. The restaurant should be in the <span class='emphasis'>same price range as the hotel</span>. Make sure you get <span class='emphasis'>phone number</span> and <span class='emphasis'>postcode</span>. You also want to book a <span class='emphasis'>taxi</span> to commute between the two places. You want to leave the <span class='emphasis'>hotel</span> by <span class='emphasis'>02:30</span>. Make sure you get <span class='emphasis'>contact number</span> and <span class='emphasis'>car type</span>",
+      "turns": 7,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am planning a trip to Cambridge and need some help with booking.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Glad to have been of help . Thank you for using the Cambridge TownInfo centre . Enjoy the rest of your day !."
+        },
+        {
+          "role": "user",
+          "content": "I need a place to stay with free parking and a 3-star rating. It should be in the expensive price range and located in the south.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Its listed as expensive ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, is there a hotel fitting that description?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What about the lensfield hotel ?"
+        },
+        {
+          "role": "user",
+          "content": "Yes, that sounds great. I would like to book it for 3 people for 5 nights starting on Friday."
+        },
+        {
+          "role": "assistant",
+          "content": "Booking was successful . Reference number is : 00000029 ."
+        },
+        {
+          "role": "user",
+          "content": "Great, thanks! I also need a restaurant. I'm looking for a Mexican place in the same area as the hotel and in the same price range."
+        },
+        {
+          "role": "assistant",
+          "content": "There is a restaurant called chiquito restaurant bar that meets your criteria . It is located in the south . It 's in the expensive price range . It is mexican food ."
+        },
+        {
+          "role": "user",
+          "content": "Could you give me the phone number and postcode for that restaurant?"
+        },
+        {
+          "role": "assistant",
+          "content": "The phone number of the restaurant is 01223400170 . Their postcode is cb17dy."
+        },
+        {
+          "role": "user",
+          "content": "Okay, great. Finally, I need to book a taxi to travel between the hotel and the restaurant. I want to leave the hotel by 02:30."
+        },
+        {
+          "role": "assistant",
+          "content": "It will be a lexus . Contact number for the taxi is 15606762112 ."
+        },
+        {
+          "role": "user",
+          "content": "Perfect, thank you so much for your help!\n\n[END]"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 12,
+      "goal_description": "You are looking for a <span class='emphasis'>place to stay</span>. The hotel should be in the type of <span class='emphasis'>guesthouse</span> and should be in the <span class='emphasis'>east</span>. The hotel should be in the <span class='emphasis'>expensive</span> price range. If there is no such hotel, how about one that is in the <span class='emphasis'>cheap</span> price range. Make sure you get <span class='emphasis'>whether they have free parking</span>, <span class='emphasis'>postcode</span>, and <span class='emphasis'>whether they have internet</span>",
+      "turns": 5,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for a place to stay. It should be a guesthouse in the east."
+        },
+        {
+          "role": "assistant",
+          "content": "There are 6 of those . I would suggest a and b guest house. Internet is available ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, and what is the price range like? I am looking for something expensive.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "There are none in the east . Perhaps another criteria change ? I ' m sorry , there are no expensive hotels . Would you like to try searching for something else ? I ' m sorry , there are no guesthouse that match your preferences . I ' m sorry , no , none in the east . I ' m sorry , there are no expensive hotels . Would you like to try searching for something else ? Sorry there is no guesthouse fitting the description you asked for."
+        },
+        {
+          "role": "user",
+          "content": "How about something cheap then?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "There are 3 of those . How about allenbell ? Their postcode is cb13js. The parking is free ."
+        },
+        {
+          "role": "user",
+          "content": "Does it have internet?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Internet is available ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, thank you!\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Thank you for contacting the help desk . Have a great day ."
+        },
+        {
+          "role": "user",
+          "content": "[END]"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 13,
+      "goal_description": "You are looking for information in Cambridge. You are looking for a <span class='emphasis'>place to stay</span>. The hotel should <span class='emphasis'>include free wifi</span> and should be in the type of <span class='emphasis'>guesthouse</span>. The hotel should have <span class='emphasis'>a star of 4</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>2 people</span> and <span class='emphasis'>5 nights</span> starting from <span class='emphasis'>friday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for a <span class='emphasis'>particular attraction</span>. Its name is called <span class='emphasis'>wandlebury country park</span>. Make sure you get <span class='emphasis'>entrance fee</span>, <span class='emphasis'>area</span>, and <span class='emphasis'>phone number</span>",
+      "turns": 11,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for a place to stay in Cambridge. It should be a guesthouse with free wifi and 4 stars.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "There are n't any that match your criteria in the cambridge . Any other suggestions ? I am sorry , there are not 4 stars available . There does n't appear to be a hotel with wifi . I was not able to find any guesthouse that met those requirements ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, can you find a guesthouse with free wifi and 4 stars in any area?"
+        },
+        {
+          "role": "assistant",
+          "content": "There are none in the cambridge . Perhaps another criteria change ? I am sorry , there are not 4 stars available . There are not any with wifi . Sorry there is no guesthouse fitting the description you asked for."
+        },
+        {
+          "role": "user",
+          "content": "Okay, let's try this. Find me a guesthouse in Cambridge with free wifi.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I have nothing in the cambridge . Can I try something else ? Unfortunately , I could n't find anything with 4 stars . There are not any with wifi . No guesthouse meet your criteria ."
+        },
+        {
+          "role": "user",
+          "content": "Ok, look for any 4-star hotel in Cambridge with free wifi then."
+        },
+        {
+          "role": "assistant",
+          "content": "There are n't any that match your criteria in the cambridge . Any other suggestions ? I am sorry I have no listings for any with 4 stars . There are not any with wifi . I was not able to find any guesthouse that met those requirements ."
+        },
+        {
+          "role": "user",
+          "content": "Ok, let's try a different approach. Find me a hotel in Cambridge with free wifi."
+        },
+        {
+          "role": "assistant",
+          "content": "I ' m sorry , no , none in the cambridge . Unfortunately , I could n't find anything with 4 stars . I ' m sorry there are no results for hotels with free internet . I was not able to find any guesthouse that met those requirements ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, find me a hotel in Cambridge, any hotel.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Sorry there are none in the cambridge . I am sorry I have no listings for any with 4 stars . There does n't appear to be a hotel with wifi . Sorry there is no hotel fitting the description you asked for."
+        },
+        {
+          "role": "user",
+          "content": "That's surprising. Okay, let's try something else. I am looking for an attraction called wandlebury country park. Can you tell me about it? Specifically, I need the area, phone number, and entrance fee.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Would you be interested in visiting a park ? It will be located in the south . They are located within the south . Here is the attraction phone number , 01223243830 . The entry fee is free ."
+        },
+        {
+          "role": "user",
+          "content": "Great! Now, going back to the hotel search, can you find any hotel in Cambridge? It seems like there are none, but I want to be sure."
+        },
+        {
+          "role": "assistant",
+          "content": "There are n't any that match your criteria in the cambridge . Any other suggestions ? I am sorry , but that hotel does not have a 4 star rating , would you like another option ? There does n't appear to be a hotel with wifi . Sorry there is no hotel fitting the description you asked for."
+        },
+        {
+          "role": "user",
+          "content": "Okay, assistant, I believe there's an error. Let's disregard the previous hotel search for now. I want to book a hotel. Could you please search for any available hotel?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "There are n't any that match your criteria in the cambridge . Any other suggestions ? I have not found anything with a star of 4 . There are not any with wifi . Sorry there is no hotel fitting the description you asked for."
+        },
+        {
+          "role": "user",
+          "content": "Okay, this is not working. Let's assume you found me a hotel. I want to book it for 2 people for 5 nights starting on Friday."
+        },
+        {
+          "role": "assistant",
+          "content": "There are none in the cambridge . Perhaps another criteria change ? I am sorry , there are not 4 stars available . I ' m sorry there are no results for hotels with free internet . There are no hotel that meet that criteria , would you like information about the hotel options ?"
+        },
+        {
+          "role": "user",
+          "content": "Let's just pretend a hotel has been found and booked! Can you please provide me with the reference number for this booking?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I ' m sorry , no , none in the cambridge . I am sorry , there are not 4 stars available . There does n't appear to be a hotel with wifi . No hotel meet your criteria ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, I see this is not working. Thanks for trying.\n\n[END]"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 14,
+      "goal_description": "You are traveling to Cambridge and looking forward to try local restaurants. You are looking for a <span class='emphasis'>restaurant</span>. The restaurant should serve <span class='emphasis'>north american</span> food and should be in the <span class='emphasis'>expensive</span> price range. The restaurant should be in the <span class='emphasis'>centre</span>. Once you find the <span class='emphasis'>restaurant</span> you want to book a table for <span class='emphasis'>6 people</span> at <span class='emphasis'>11:45</span> on <span class='emphasis'>sunday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You are also looking for a <span class='emphasis'>particular hotel</span>. Its name is called <span class='emphasis'>acorn guest house</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>the same group of people</span> and <span class='emphasis'>5 nights</span> starting from <span class='emphasis'>the same day</span>. Make sure you get the <span class='emphasis'>reference number</span>",
+      "turns": 4,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for restaurants in Cambridge. it should serve north american food in the centre and be in the expensive price range.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "How does the gourmet burger kitchen sound ? It is in the centre area . It is north american food . It 's in the expensive price range ."
+        },
+        {
+          "role": "user",
+          "content": "Sounds great. I want to book a table there for 6 people at 11:45 on Sunday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Your reference number is 00000099 ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, great. Now I am also looking for a hotel called Acorn Guest House.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "You can try acorn guest house."
+        },
+        {
+          "role": "user",
+          "content": "I want to book it for the same group of people for 5 nights starting on Sunday."
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the booking information : Booking was successful . Reference number is : 00000001."
+        },
+        {
+          "role": "user",
+          "content": "Thank you! **[END]**\n"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 15,
+      "goal_description": "You are traveling to Cambridge and excited about seeing local tourist attractions. You are looking for a <span class='emphasis'>particular attraction</span>. Its name is called <span class='emphasis'>whipple museum of the history of science</span>. Make sure you get <span class='emphasis'>area</span>, <span class='emphasis'>phone number</span>, and <span class='emphasis'>attraction type</span>. You are also looking for a <span class='emphasis'>particular hotel</span>. Its name is called <span class='emphasis'>alexander bed and breakfast</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>4 people</span> and <span class='emphasis'>2 nights</span> starting from <span class='emphasis'>friday</span>. Make sure you get the <span class='emphasis'>reference number</span>. You also want to book a <span class='emphasis'>taxi</span> to commute between the two places. You want to leave the <span class='emphasis'>attraction</span> by <span class='emphasis'>04:15</span>. Make sure you get <span class='emphasis'>contact number</span> and <span class='emphasis'>car type</span>",
+      "turns": 4,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am planning a trip to Cambridge and need some information. Firstly, can you give me the details for the Whipple Museum of the History of Science? I need the area, phone number, and type.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "We have whipple museum of the history of science . It is located in the centre . That one is located in the centre . The attraction phone number is 01223330906 . It is listed as museum ."
+        },
+        {
+          "role": "user",
+          "content": "Great! Now I am looking for a hotel called Alexander Bed and Breakfast.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What about alexander bed and breakfast ? It is a cheap place . It 's in centre . They have free parking . It is a guesthouse . It has 4 stars . It has wifi ."
+        },
+        {
+          "role": "user",
+          "content": "That sounds good. I want to book it for 4 people for 2 nights starting on Friday."
+        },
+        {
+          "role": "assistant",
+          "content": "All set . Your reference number is 00000002 ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, great. Now I need a taxi to go from the Whipple Museum of the History of Science to the Alexander Bed and Breakfast. I want to leave the museum by 4:15 PM."
+        },
+        {
+          "role": "assistant",
+          "content": "The model of the car was volkswagen . The contact number is 41926006597 ."
+        },
+        {
+          "role": "user",
+          "content": "Perfect, thank you for all your help! **[END]**"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 16,
+      "goal_description": "You are looking for a <span class='emphasis'>place to stay</span>. The hotel should <span class='emphasis'>include free wifi</span> and should be in the <span class='emphasis'>cheap</span> price range. The hotel should <span class='emphasis'>include free parking</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>1 people</span> and <span class='emphasis'>2 nights</span> starting from <span class='emphasis'>friday</span>. If the booking fails how about <span class='emphasis'>1 nights</span>. Make sure you get the <span class='emphasis'>reference number</span>",
+      "turns": 3,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I'm looking for a place to stay. It should have free wifi and be in the cheap price range.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I have 10 different options for you !. How about allenbell ? Fits your request perfectly . The address is 517a coldham lane ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, and does it include free parking?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "They have free parking ."
+        },
+        {
+          "role": "user",
+          "content": "Great. I'd like to book it for 1 person for 2 nights starting from Friday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Your reference number is 00000002 ."
+        },
+        {
+          "role": "user",
+          "content": "Okay perfect, thanks! [END]\n"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 17,
+      "goal_description": "You are looking for information in Cambridge. You are looking for a <span class='emphasis'>particular restaurant</span>. Its name is called <span class='emphasis'>cotto</span>. Make sure you get <span class='emphasis'>postcode</span> and <span class='emphasis'>address</span>. You are also looking for a <span class='emphasis'>particular attraction</span>. Its name is called <span class='emphasis'>riverboat georgina</span>. Make sure you get <span class='emphasis'>phone number</span> and <span class='emphasis'>attraction type</span>",
+      "turns": 3,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for some information in Cambridge. I am looking for a restaurant called cotto. Can you find me the postcode and address?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Okay , how about cotto ? That is a british restaurant . It is in the centre area . The post code is cb11bg . It is at 183 East Road City Centre."
+        },
+        {
+          "role": "user",
+          "content": "Great, thanks! I am also looking for an attraction called riverboat georgina. Can you find me its phone number and attraction type?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What about riverboat georgina ? It is listed as boat . Here is the attraction phone number , 01223902091 . Would you be interested in visiting a boat ?"
+        },
+        {
+          "role": "user",
+          "content": "Yes, that is perfect! Thanks for your help.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Have a good day ."
+        },
+        {
+          "role": "user",
+          "content": "[END]\n"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 18,
+      "goal_description": "You are looking for information in Cambridge. You are looking for <span class='emphasis'>places to go</span> in town. The attraction should be in the <span class='emphasis'>centre</span>. Make sure you get <span class='emphasis'>attraction type</span> and <span class='emphasis'>entrance fee</span>. You are also looking for a <span class='emphasis'>train</span>. The train should <span class='emphasis'>arrive by 18:15</span> and should leave on <span class='emphasis'>tuesday</span>. The train should go to <span class='emphasis'>stansted airport</span> and should depart from <span class='emphasis'>cambridge</span>. Make sure you get <span class='emphasis'>departure time</span> and <span class='emphasis'>price</span>",
+      "turns": 20,
+      "completed": false,
+      "reward": null,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I'm looking for places to go in the centre of Cambridge. Can you tell me the attraction type and entrance fee?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "We have 44 of those ! Anything specific you need or just a recommendation ? It is a theatre . The entry fee is ? . Vue cinema meets your requirements ."
+        },
+        {
+          "role": "user",
+          "content": "Could you recommend something, along with its attraction type and entrance fee?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I ' ve found 44 places for you to go . Do you have any specific ideas in mind ? The entry fee is ? . We have cambridge university botanic gardens. Their postcode is cb21jf . How about a park ?"
+        },
+        {
+          "role": "user",
+          "content": "What type of attraction is the Cambridge University Botanic Gardens, and what is the entrance fee?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Their entrance fee is 4 pounds by our system currently . There are some wonderful park in that area . It 's considered a park . They are located within the centre ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, great. I am also looking for a train. I need a train to Stansted Airport that departs from Cambridge on Tuesday and arrives by 18:15. Can you find me the departure time and price?"
+        },
+        {
+          "role": "assistant",
+          "content": "I have a train leaving at 05:40 would that be okay ? The fare is 10.10 pounds per ticket ."
+        },
+        {
+          "role": "user",
+          "content": "Is there a later train? I need to arrive by 18:15.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel , please ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "On what day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day would you like ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "On what day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you confirm your desired travel day ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "On what day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday."
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Can you tell me what day you would like to travel , please ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you be traveling ?"
+        },
+        {
+          "role": "user",
+          "content": "Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "What day will you travel on ?"
+        }
+      ]
+    },
+    {
+      "dialogue_id": 19,
+      "goal_description": "You are traveling to Cambridge and looking forward to try local restaurants. You are looking for a <span class='emphasis'>restaurant</span>. The restaurant should serve <span class='emphasis'>indian</span> food and should be in the <span class='emphasis'>expensive</span> price range. Make sure you get <span class='emphasis'>address</span> and <span class='emphasis'>phone number</span>. You are also looking for a <span class='emphasis'>particular hotel</span>. Its name is called <span class='emphasis'>allenbell</span>. Once you find the <span class='emphasis'>hotel</span> you want to book it for <span class='emphasis'>6 people</span> and <span class='emphasis'>3 nights</span> starting from <span class='emphasis'>tuesday</span>. If the booking fails how about <span class='emphasis'>1 nights</span>. Make sure you get the <span class='emphasis'>reference number</span>",
+      "turns": 5,
+      "completed": true,
+      "reward": 40,
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Hello, how may I help you today?"
+        },
+        {
+          "role": "user",
+          "content": "I am looking for an expensive Indian restaurant.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "I have 14 options for you. I would suggest maharajah tandoori restaurant . Their address is 41518 Castle Street City Centre ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, can you give me their phone number?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "The phone number of the restaurant is 01223302330 ."
+        },
+        {
+          "role": "user",
+          "content": "Great. I am also looking for a hotel called allenbell"
+        },
+        {
+          "role": "assistant",
+          "content": "How about allenbell ? It has free wifi . It has a rating of 4 stars . It 's located in the east ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, I want to book it for 6 people for 3 nights starting on Tuesday.\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Your reference number is 00000003 ."
+        },
+        {
+          "role": "user",
+          "content": "Okay. If the booking fails how about 1 nights?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Your reference number is 00000003 ."
+        },
+        {
+          "role": "user",
+          "content": "Okay, thank you! **[END]**\n"
+        }
+      ]
+    }
+  ]
+}

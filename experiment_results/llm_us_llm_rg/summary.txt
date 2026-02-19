@@ -1,0 +1,5 @@
+model: openrouter/google/gemini-2.0-flash-001
+total_dialogs: 20
+completed_rate: 0.9
+avg_turns: 6.6
+avg_reward: 36.8421052631579

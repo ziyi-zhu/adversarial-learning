@@ -1,0 +1,25 @@
+{
+  "rule_us_rule_sys": {
+    "combo": "rule_us_rule_sys",
+    "n_dialogues": 10,
+    "completion_rate": 0.5,
+    "success_rate": 0.2,
+    "avg_turns": 13.8
+  },
+  "llm_us_llm_rg": {
+    "combo": "llm_us_llm_rg",
+    "n_dialogues": 10,
+    "completion_rate": 0.9,
+    "success_rate": 0.9,
+    "avg_turns": 7.7,
+    "model": "openrouter/google/gemini-2.0-flash-001"
+  },
+  "llm_us_rule_sys": {
+    "combo": "llm_us_rule_sys",
+    "n_dialogues": 10,
+    "completion_rate": 0.7,
+    "success_rate": 0.7,
+    "avg_turns": 8.2,
+    "model": "openrouter/google/gemini-2.0-flash-001"
+  }
+}
