@@ -15,7 +15,11 @@ keyed by US and RG model IDs.
 Uploads to HuggingFace.
 """
 
-import json, os, sys, logging, traceback
+import json
+import logging
+import os
+import sys
+import traceback
 from copy import deepcopy
 
 os.environ["LITELLM_LOG"] = "ERROR"
@@ -24,16 +28,19 @@ logging.getLogger("litellm").setLevel(logging.ERROR)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 import litellm
+
 litellm.suppress_debug_info = True
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "ConvLab-3"))
 
-from convlab.util.unified_datasets_util import load_dataset as load_convlab_dataset
-from convlab.base_models.llm.user_simulator import LLM_US, LLM_RG
 from datasets import Dataset
 
+from convlab.base_models.llm.user_simulator import LLM_RG, LLM_US
+from convlab.util.unified_datasets_util import load_dataset as load_convlab_dataset
+
 LLM_US_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
-LLM_RG_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
+# LLM_RG_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
+LLM_RG_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-rg-sft-5c55bb5c"
 N_DIALOGUES = 10
 INITIAL_SYSTEM_GREETING = "Hello, how may I help you today?"
 HF_REPO = "slingshot/multiwoz-2.1-user-disc-base"
@@ -71,9 +78,9 @@ def _save_to_cache(cache_dir, idx, data):
 # Description repair
 # ---------------------------------------------------------------------------
 def _repair_description(description):
-    parts = description.split('. ')
+    parts = description.split(". ")
     if len(parts) > 10 and sum(len(p) <= 2 for p in parts) / len(parts) > 0.8:
-        return ''.join(parts)
+        return "".join(parts)
     return description
 
 
@@ -88,9 +95,7 @@ def _repair_goal(goal):
 
 def build_system_prompt(goal):
     description = _repair_description(goal.get("description", "") or "")
-    goal_description = '.\n'.join(
-        ['* ' + item for item in description.split('. ')]
-    )
+    goal_description = ".\n".join(["* " + item for item in description.split(". ")])
     return f"Goal:\n{goal_description}\n\n{LLM_US.DEFAULT_SYSTEM_INSTRUCTION}"
 
 
@@ -181,7 +186,9 @@ def main():
             cached_count += 1
         else:
             if (i + 1) % 10 == 0 or i == 0:
-                print(f"  Simulating dialog {i+1}/{len(val_dialogues)} ({dialogue_id}) ...")
+                print(
+                    f"  Simulating dialog {i + 1}/{len(val_dialogues)} ({dialogue_id}) ..."
+                )
             try:
                 sim_msgs = run_simulation(goal, system_prompt)
                 _save_to_cache(cdir, i, sim_msgs)
@@ -193,14 +200,16 @@ def main():
 
         sim_n = sum(1 for m in sim_msgs if m["role"] == "assistant")
 
-        all_rows.append({
-            "dialogue_id": dialogue_id,
-            "domains": domains,
-            "real_n_turns": real_n,
-            "simulated_n_turns": sim_n,
-            "real_messages": real_msgs,
-            "simulated_messages": sim_msgs,
-        })
+        all_rows.append(
+            {
+                "dialogue_id": dialogue_id,
+                "domains": domains,
+                "real_n_turns": real_n,
+                "simulated_n_turns": sim_n,
+                "real_messages": real_msgs,
+                "simulated_messages": sim_msgs,
+            }
+        )
 
     print(f"\n  {len(all_rows)} rows ({cached_count} from cache, {errors} errors)")
 

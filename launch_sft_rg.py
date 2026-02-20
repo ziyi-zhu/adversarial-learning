@@ -17,7 +17,7 @@ from together import Together
 
 # Same repo as in generate_sft_datasets.py
 HF_REPO_RG = os.environ.get("HF_REPO_RG", "slingshot/multiwoz-2.1-response-gen-sft")
-MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct-Reference"
+MODEL = "meta-llama/Meta-Llama-3.1-70B-Instruct-Reference"
 
 
 def main():
@@ -94,8 +94,8 @@ def main():
     create_kw = {
         "training_file": training_file_id,
         "model": MODEL,
-        "n_epochs": 3,
-        "n_checkpoints": 3,
+        "n_epochs": 1,
+        "n_checkpoints": 1,
         "learning_rate": 1e-5,
         "lr_scheduler_type": "linear",
         "min_lr_ratio": 0.0,

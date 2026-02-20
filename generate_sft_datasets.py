@@ -25,7 +25,6 @@ HF_REPO_US = os.environ.get("HF_REPO_US", "slingshot/multiwoz-2.1-user-sim-sft")
 HF_REPO_RG = os.environ.get("HF_REPO_RG", "slingshot/multiwoz-2.1-response-gen-sft")
 
 INITIAL_SYSTEM_GREETING = "Hello, how may I help you today?"
-RG_FIRST_USER_PLACEHOLDER = "[Start of conversation]"
 
 
 def _repair_description(description):
@@ -72,6 +71,12 @@ def process_dialogue_us(dialogue):
     if messages[-1]["role"] == "user" and len(messages) > 1:
         messages.pop()
 
+    # Append [END] to last user (assistant) message per system prompt: "If and only if you achieve your goal, express your thanks and generate **\"[END]\"** token."
+    if messages[-1]["role"] == "assistant":
+        last_content = messages[-1]["content"]
+        if not last_content.strip().endswith("[END]"):
+            messages[-1]["content"] = last_content.rstrip() + " [END]"
+
     n_assistant_turns = sum(1 for m in messages if m["role"] == "assistant")
     return {
         "dialogue_id": dialogue_id,
@@ -90,7 +95,9 @@ def build_rg_system_prompt():
 
 
 def process_dialogue_rg(dialogue):
-    """One row per dialogue. 'user' = user utterances, 'assistant' = system utterances."""
+    """One row per dialogue. 'user' = user utterances, 'assistant' = system utterances.
+    Replicate exactly what RG sees during inference: no placeholder first turn.
+    At inference the first message to RG is the first user utterance (greeting is hard-coded)."""
     turns = dialogue["turns"]
     dialogue_id = dialogue["dialogue_id"]
     domains = dialogue.get("domains", [])
@@ -101,11 +108,10 @@ def process_dialogue_rg(dialogue):
     if not turns:
         return None
 
-    # If system speaks first (greeting), add a dummy user turn so assistant can output the greeting.
+    # During inference RG never sees a "[Start of conversation]" turn; first user message is the real first user utterance.
+    # If dialogue starts with system (greeting), skip it so first turn is user -> assistant (system reply).
     idx = 0
     if turns[0]["speaker"] == "system":
-        messages.append({"role": "user", "content": RG_FIRST_USER_PLACEHOLDER})
-        messages.append({"role": "assistant", "content": turns[0]["utterance"]})
         idx = 1
 
     while idx < len(turns):

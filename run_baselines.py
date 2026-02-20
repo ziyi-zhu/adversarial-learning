@@ -19,7 +19,6 @@ import random
 import sys
 import traceback
 from copy import deepcopy
-from datetime import datetime
 
 import numpy as np
 
@@ -37,7 +36,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "ConvLab-3"))
 
 SEED = 42
 N_DIALOGUES = 1000
-LLM_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
+LLM_MODEL = "openrouter/meta-llama/llama-3.1-70b-instruct"
 OUT_ROOT = "experiment_results"
 CACHE_DIR = "cache"
 
@@ -716,11 +715,6 @@ def main():
             all_summaries[name] = {"error": traceback.format_exc()[:500]}
             print(f"  FAILED: {name}")
 
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    path = os.path.join(OUT_ROOT, f"all_summaries_{ts}.json")
-    with open(path, "w") as f:
-        json.dump(all_summaries, f, indent=2)
-
     print(f"\n{'=' * 70}")
     print(f"FINAL RESULTS  ({N_DIALOGUES} test dialogues each)")
     print(f"{'=' * 70}")
@@ -734,7 +728,6 @@ def main():
                 f"{name:<25} {s['completion_rate']:>11.0%} "
                 f"{s['success_rate']:>11.0%} {s['avg_turns']:>11.1f}"
             )
-    print(f"\nSaved to {path}")
 
 
 if __name__ == "__main__":
