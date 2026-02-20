@@ -36,7 +36,7 @@ litellm.suppress_debug_info = True
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "ConvLab-3"))
 
 SEED = 42
-N_DIALOGUES = 10
+N_DIALOGUES = 1000
 LLM_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
 OUT_ROOT = "experiment_results"
 CACHE_DIR = "cache"
@@ -697,7 +697,7 @@ COMBOS = [
     ("tus_rule_sys", run_tus_rule_sys),
     ("gentus_rule_sys", run_gentus_rule_sys),
     ("llm_us_llm_rg", run_llm_us_llm_rg),
-    ("llm_us_rule_sys", run_llm_us_rule_sys),
+    # ("llm_us_rule_sys", run_llm_us_rule_sys),
 ]
 
 
