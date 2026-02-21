@@ -4,3 +4,5 @@ results/
 experiment_results/
 cache/
 convlab/
+output/
+*.tar.gz
