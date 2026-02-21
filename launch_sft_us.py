@@ -96,7 +96,7 @@ def main():
         "model": MODEL,
         "n_epochs": 1,
         "n_checkpoints": 1,
-        "learning_rate": 1e-5,
+        "learning_rate": 5e-6,
         "lr_scheduler_type": "linear",
         "min_lr_ratio": 0.0,
         "training_method": "sft",

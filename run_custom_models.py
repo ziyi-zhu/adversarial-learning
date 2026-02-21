@@ -19,12 +19,12 @@ import run_baselines  # noqa: E402 - sets path, litellm logging, ConvLab-3 on pa
 
 # Model identifiers (litellm format)
 # US: same Llama 8B Instruct as in run_baselines, via OpenRouter
-# LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-sft-badfa423"
-LLM_US_MODEL = "openrouter/meta-llama/llama-3.1-70b-instruct"
+LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-sft-4dcc3672"
+# LLM_US_MODEL = "openrouter/meta-llama/llama-3.1-70b-instruct"
 # RG: Together AI OpenAI-compatible endpoint; litellm uses together_ai/{model_id}
 LLM_RG_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-rg-sft-5c55bb5c"
 
-COMBO_NAME = "llm_us_sft_rg"
+COMBO_NAME = "sft_us_sft_rg"
 
 
 def run_llm_us_llm_rg_custom():

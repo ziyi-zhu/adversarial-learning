@@ -38,10 +38,11 @@ from datasets import Dataset
 from convlab.base_models.llm.user_simulator import LLM_RG, LLM_US
 from convlab.util.unified_datasets_util import load_dataset as load_convlab_dataset
 
-LLM_US_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
-# LLM_RG_MODEL = "openrouter/meta-llama/llama-3.1-8b-instruct"
+# LLM_US_MODEL = "openrouter/meta-llama/llama-3.1-70b-instruct"
+LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-sft-4dcc3672"
+# LLM_RG_MODEL = "openrouter/meta-llama/llama-3.1-70b-instruct"
 LLM_RG_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-rg-sft-5c55bb5c"
-N_DIALOGUES = 10
+N_DIALOGUES = 1000
 INITIAL_SYSTEM_GREETING = "Hello, how may I help you today?"
 HF_REPO = "slingshot/multiwoz-2.1-user-disc-base"
 CACHE_DIR = "cache"
@@ -93,6 +94,24 @@ def _repair_goal(goal):
     return goal
 
 
+def _clean_trailing_messages(messages):
+    """Ensure last message is from user (role=assistant), clean [END]/[STOP]."""
+    if len(messages) > 1 and messages[-1]["role"] == "user":
+        messages.pop()
+
+    if len(messages) > 1 and messages[-1]["role"] == "assistant":
+        content = messages[-1]["content"]
+        content = content.replace("[END]", "").replace("[STOP]", "").strip()
+        if not content:
+            messages.pop()
+            if len(messages) > 1 and messages[-1]["role"] == "user":
+                messages.pop()
+        else:
+            messages[-1]["content"] = content
+
+    return messages
+
+
 def build_system_prompt(goal):
     description = _repair_description(goal.get("description", "") or "")
     goal_description = ".\n".join(["* " + item for item in description.split(". ")])
@@ -116,10 +135,7 @@ def build_real_messages(dialogue, system_prompt):
         elif turn["speaker"] == "system":
             messages.append({"role": "user", "content": turn["utterance"]})
 
-    if messages[-1]["role"] == "user" and len(messages) > 1:
-        messages.pop()
-
-    return messages
+    return _clean_trailing_messages(messages)
 
 
 def run_simulation(goal, system_prompt):
@@ -144,10 +160,7 @@ def run_simulation(goal, system_prompt):
         sys_msg = system_model.response(user_msg)
         messages.append({"role": "user", "content": sys_msg})
 
-    if messages[-1]["role"] == "user" and len(messages) > 1:
-        messages.pop()
-
-    return messages
+    return _clean_trailing_messages(messages)
 
 
 # ---------------------------------------------------------------------------

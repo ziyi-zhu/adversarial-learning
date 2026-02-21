@@ -597,7 +597,8 @@ def run_llm_us_llm_rg():
             "reward": reward,
             "conversation": conversation,
         }
-        _save_to_cache(cdir, i, result)
+        if conversation:
+            _save_to_cache(cdir, i, result)
         results.append(result)
 
     return _save(
@@ -677,7 +678,8 @@ def run_llm_us_rule_sys():
             "reward": reward,
             "conversation": conversation,
         }
-        _save_to_cache(cdir, i, result)
+        if conversation:
+            _save_to_cache(cdir, i, result)
         results.append(result)
 
     return _save(
