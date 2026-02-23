@@ -34,7 +34,7 @@ def main():
     )
     parser.add_argument(
         "--suffix",
-        default="multiwoz-us-dpo-v1",
+        default="multiwoz-us-dial-it1",
         help="Suffix for the fine-tuned model name",
     )
     parser.add_argument(
@@ -42,6 +42,12 @@ def main():
         type=float,
         default=0.1,
         help="DPO beta parameter (default: 0.1)",
+    )
+    parser.add_argument(
+        "--top-margin-frac",
+        type=float,
+        default=0.5,
+        help="After chosen>0/rejected<0 filter, keep this fraction of pairs with highest (chosen-rejected) margin (default: 0.5)",
     )
     parser.add_argument(
         "--dry-run",
@@ -61,6 +67,18 @@ def main():
     # Filter: keep only rows where chosen_reward > 0 and rejected_reward < 0
     ds = ds.filter(lambda x: x["chosen_reward"] > 0 and x["rejected_reward"] < 0)
     print(f"  After filtering (chosen > 0, rejected < 0): {len(ds)} examples")
+
+    # Keep only top fraction by margin (chosen_reward - rejected_reward)
+    if args.top_margin_frac < 1.0 and len(ds) > 0:
+        margin = [c - r for c, r in zip(ds["chosen_reward"], ds["rejected_reward"])]
+        ds = ds.add_column("_margin", margin)
+        ds = ds.sort("_margin", reverse=True)
+        n_keep = max(1, int(len(ds) * args.top_margin_frac))
+        ds = ds.select(range(n_keep))
+        ds = ds.remove_columns("_margin")
+        print(
+            f"  After keeping top {args.top_margin_frac * 100:.0f}%% by margin: {len(ds)} examples"
+        )
 
     if len(ds) == 0:
         raise SystemExit("No examples remain after filtering.")
