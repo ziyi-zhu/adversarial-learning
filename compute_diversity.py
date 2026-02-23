@@ -16,6 +16,10 @@ Metrics:
     (KL(P‖R_λ), KL(Q‖R_λ)) scaled to [0,1]. KL(Q‖P) = mode dropping (simulator fails to
     cover human modes); KL(P‖Q) = hallucination (simulator generates unlike human).
     Requires: pip install mauve-text openai; OPENAI_API_KEY set.
+
+  MAUVE results are cached by combo name and num_buckets; each cache file is named
+  {combo}_buckets_{num_buckets}.json so you can delete a combo's cache selectively.
+  Cache dir: MAUVE_CACHE_DIR env (default: .mauve_cache next to this script).
 """
 
 import json
@@ -32,6 +36,43 @@ RESULTS_DIR = "experiment_results"
 EMBED_BATCH_SIZE = 100
 MAUVE_NUM_BUCKETS = 250
 EMBEDDING_MODEL = "text-embedding-3-small"
+_SCRIPT_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+MAUVE_CACHE_DIR = os.environ.get("MAUVE_CACHE_DIR", os.path.join(_SCRIPT_DIR, ".mauve_cache"))
+
+
+def _mauve_cache_filename(combo, num_buckets):
+    """Safe cache filename from combo and num_buckets (e.g. dial_us_sft_rg_v1_buckets_250.json)."""
+    safe = str(combo).replace(os.sep, "_").replace("\\", "_")
+    return f"{safe}_buckets_{num_buckets}"
+
+
+def _mauve_cache_get(cache_name):
+    """Load MAUVE result from cache if present. cache_name = combo_buckets_N (no .json). Returns dict or None."""
+    if not cache_name:
+        return None
+    path = os.path.join(MAUVE_CACHE_DIR, cache_name + ".json")
+    path = os.path.abspath(path)
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _mauve_cache_set(cache_name, result):
+    """Write MAUVE result to cache. cache_name = combo_buckets_N (no .json)."""
+    if not cache_name:
+        return
+    path = os.path.join(MAUVE_CACHE_DIR, cache_name + ".json")
+    path = os.path.abspath(path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(result, f)
+    except OSError:
+        pass
 
 
 def _embed_openai(texts, model=EMBEDDING_MODEL, show_progress=True):
@@ -65,17 +106,32 @@ def compute_mauve_with_openai(
     q_features=None,
     num_buckets=MAUVE_NUM_BUCKETS,
     show_progress=True,
+    use_cache=True,
+    cache_combo=None,
+    embedding_model=EMBEDDING_MODEL,
 ):
     """
     MAUVE between two utterance distributions using the configured embedding model.
     P = model/simulator, Q = human/real.
     If q_features is provided, Q is not re-embedded (embed GT once and reuse).
     Returns dict with mauve, frontier_integral, kl_pq (hallucination), kl_qp (mode dropping).
+    When use_cache is True and cache_combo is set, results are cached under
+    {combo}_buckets_{num_buckets}.json for selective deletion.
     """
     try:
         import mauve
     except ImportError:
         raise ImportError("MAUVE requires: pip install mauve-text")
+
+    # If cache is enabled and we have a combo, try loading from file first (same combo + num_buckets = load directly)
+    if use_cache and cache_combo is not None:
+        cache_name = _mauve_cache_filename(cache_combo, num_buckets)
+        cached = _mauve_cache_get(cache_name)
+        if cached is not None:
+            if show_progress:
+                print("  MAUVE (cache hit)", flush=True)
+            return cached
+
     if not p_utterances:
         return {
             "mauve": None,
@@ -90,15 +146,16 @@ def compute_mauve_with_openai(
             "kl_pq_hallucination": None,
             "kl_qp_mode_dropping": None,
         }
+
     if show_progress:
         print("  Embedding P (user simulator)...", flush=True)
-    p_feats = _embed_openai(p_utterances, show_progress=show_progress)
+    p_feats = _embed_openai(p_utterances, model=embedding_model, show_progress=show_progress)
     if q_features is not None:
         q_feats = np.asarray(q_features, dtype=np.float32)
     else:
         if show_progress:
             print("  Embedding Q (real utterances)...", flush=True)
-        q_feats = _embed_openai(q_utterances, show_progress=show_progress)
+        q_feats = _embed_openai(q_utterances, model=embedding_model, show_progress=show_progress)
     if show_progress:
         print("  Computing MAUVE (k-means + divergence frontier)...", flush=True)
     out = mauve.compute_mauve(
@@ -117,12 +174,15 @@ def compute_mauve_with_openai(
     q_hist = q_hist / q_hist.sum()
     kl_pq = float(np.sum(p_hist * (np.log(p_hist) - np.log(q_hist))))
     kl_qp = float(np.sum(q_hist * (np.log(q_hist) - np.log(p_hist))))
-    return {
+    result = {
         "mauve": float(out.mauve),
         "frontier_integral": float(out.frontier_integral),
         "kl_pq_hallucination": kl_pq,
         "kl_qp_mode_dropping": kl_qp,
     }
+    if use_cache and cache_combo is not None:
+        _mauve_cache_set(_mauve_cache_filename(cache_combo, num_buckets), result)
+    return result
 
 def extract_user_utterances(results_path):
     with open(results_path) as f:
@@ -229,6 +289,11 @@ def main():
         action="store_true",
         help=f"Compute MAUVE (user simulator vs real) using {EMBEDDING_MODEL}. Needs OPENAI_API_KEY, mauve-text, openai.",
     )
+    parser.add_argument(
+        "--no-mauve-cache",
+        action="store_true",
+        help="Disable MAUVE result caching (recompute even when inputs match a previous run).",
+    )
     args = parser.parse_args()
 
     all_metrics = {}
@@ -267,8 +332,29 @@ def main():
 
     # MAUVE: user simulator (P) vs real utterances (Q); embed GT once and reuse
     if args.mauve and entries_to_mauve and gt_utterances:
-        print("  Embedding Q (ground-truth, once)...", flush=True)
-        gt_features = _embed_openai(gt_utterances, show_progress=True)
+        use_cache = not args.no_mauve_cache
+        # Try cache first for each combo so we can skip embedding Q if all hit
+        cache_results = {}
+        if use_cache:
+            for entry, _ in entries_to_mauve:
+                cache_name = _mauve_cache_filename(entry, MAUVE_NUM_BUCKETS)
+                cached = _mauve_cache_get(cache_name)
+                if cached is not None:
+                    cache_results[entry] = cached
+        cached_combos = sorted(cache_results.keys())
+        new_combos = sorted(e for e, _ in entries_to_mauve if e not in cache_results)
+        print(f"  MAUVE cache: cached={cached_combos}  new={new_combos}", flush=True)
+        need_embed_q = use_cache and len(cache_results) < len(entries_to_mauve)
+        if not use_cache:
+            need_embed_q = True
+
+        gt_features = None
+        if need_embed_q:
+            print("  Embedding Q (ground-truth, once)...", flush=True)
+            gt_features = _embed_openai(gt_utterances, show_progress=True)
+        elif cache_results:
+            print("  MAUVE: all combos from cache (skipping Q embed)", flush=True)
+
         try:
             from tqdm import tqdm
             _mauve_iter = tqdm(entries_to_mauve, desc="MAUVE (simulator vs real)", unit="combo")
@@ -278,12 +364,17 @@ def main():
             if hasattr(_mauve_iter, "set_postfix"):
                 _mauve_iter.set_postfix(combo=entry[:12])
             try:
-                mauve_out = compute_mauve_with_openai(
-                    utterances,
-                    q_features=gt_features,
-                    num_buckets=MAUVE_NUM_BUCKETS,
-                    show_progress=False,
-                )
+                if entry in cache_results:
+                    mauve_out = cache_results[entry]
+                else:
+                    mauve_out = compute_mauve_with_openai(
+                        utterances,
+                        q_features=gt_features,
+                        num_buckets=MAUVE_NUM_BUCKETS,
+                        show_progress=False,
+                        use_cache=use_cache,
+                        cache_combo=entry,
+                    )
                 for k, v in mauve_out.items():
                     all_metrics[entry][k] = v
             except Exception as e:

@@ -3,6 +3,7 @@ __pycache__/
 results/
 experiment_results/
 cache/
+.mauve_cache/
 convlab/
 output/
 *.tar.gz
