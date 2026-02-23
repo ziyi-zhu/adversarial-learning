@@ -31,10 +31,10 @@ from transformers.data.data_collator import (
 
 # ── Constants ──────────────────────────────────────────────────────────────
 
-HF_DATASET = "slingshot/multiwoz-2.1-user-disc-v1"
+HF_DATASET = "slingshot/multiwoz-2.1-user-disc-sft"
 MODEL_NAME = "meta-llama/Meta-Llama-3.1-8B-Instruct"
-OUTPUT_DIR = "output/assistant-discriminator"
-RUN_NAME = "assistant-disc-v2"
+OUTPUT_DIR = "output"
+RUN_NAME = "user-disc-sft"
 WANDB_PROJECT = "DIAL"
 
 IGNORE_LABEL = -100

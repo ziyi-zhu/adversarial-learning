@@ -39,13 +39,12 @@ from transformers import (
 # ── Constants ──────────────────────────────────────────────────────────────
 
 DISCRIMINATOR_CHECKPOINT = (
-    "/mnt/workspace/adversarial-learning/output/assistant-discriminator/"
-    "assistant-disc-v1/checkpoint-107"
+    "/mnt/workspace/adversarial-learning/output/user-disc-sft/checkpoint-107"
 )
 DISCRIMINATOR_BASE_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 
-HF_DATASET = "slingshot/multiwoz-2.1-user-disc-base"
-HF_OUTPUT_REPO = "slingshot/multiwoz-2.1-user-pref-v1"
+HF_DATASET = "slingshot/multiwoz-2.1-user-disc-sft"
+HF_OUTPUT_REPO = "slingshot/multiwoz-2.1-user-pref-sft"
 
 US_MODEL = (
     "together_ai/slingshot/"

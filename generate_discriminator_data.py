@@ -39,13 +39,13 @@ from convlab.base_models.llm.user_simulator import LLM_RG, LLM_US
 from convlab.util.unified_datasets_util import load_dataset as load_convlab_dataset
 
 # LLM_US_MODEL = "openrouter/meta-llama/llama-3.1-70b-instruct"
-# LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-sft-4dcc3672"
-LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it1-c40bfde9-1119df65"
+LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-sft-4dcc3672"
+# LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it1-c40bfde9-da3aea96"
 # LLM_RG_MODEL = "openrouter/meta-llama/llama-3.1-70b-instruct"
 LLM_RG_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-rg-sft-5c55bb5c"
 N_DIALOGUES = 1000
 INITIAL_SYSTEM_GREETING = "Hello, how may I help you today?"
-HF_REPO = "slingshot/multiwoz-2.1-user-disc-it2"
+HF_REPO = "slingshot/multiwoz-2.1-user-disc-sft"
 CACHE_DIR = "cache"
 MAX_TURNS = 20
 
@@ -110,6 +110,17 @@ def _clean_trailing_messages(messages):
         else:
             messages[-1]["content"] = content
 
+    return messages
+
+
+def _append_end_to_last_user_simulator_message(messages):
+    """Append [END] to the last user simulator (assistant) message."""
+    for i in range(len(messages) - 1, -1, -1):
+        if messages[i]["role"] == "assistant":
+            messages[i]["content"] = (
+                messages[i]["content"].rstrip() + " [END]"
+            ).strip()
+            break
     return messages
 
 
@@ -213,6 +224,9 @@ def main():
                 errors += 1
 
         sim_n = sum(1 for m in sim_msgs if m["role"] == "assistant")
+
+        _append_end_to_last_user_simulator_message(real_msgs)
+        _append_end_to_last_user_simulator_message(sim_msgs)
 
         all_rows.append(
             {
