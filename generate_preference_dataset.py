@@ -21,6 +21,8 @@ Roles in the dataset (same convention as generate_discriminator_data.py):
   assistant = US (user-simulator) utterances
 """
 
+import json
+import os
 import traceback
 from typing import Any, Dict, List
 
@@ -54,6 +56,7 @@ US_TEMPERATURE = 0.8
 US_MAX_TOKENS = 256
 NUM_REGENERATIONS = 8  # +1 original = 9 total candidates
 N_DIALOGUES = 1000
+CACHE_DIR = "cache"
 
 CHAT_TEMPLATE = """
 {{- bos_token }}
@@ -64,6 +67,32 @@ CHAT_TEMPLATE = """
     {{- '<|start_header_id|>assistant<|end_header_id|>\n\n' }}
 {%- endif %}
 """.strip()
+
+
+# ── Cache helpers ────────────────────────────────────────────────────────
+
+
+def _sanitize(name: str) -> str:
+    return name.replace("/", "_").replace(" ", "_")
+
+
+def _preference_cache_dir() -> str:
+    return os.path.join(CACHE_DIR, "preference", _sanitize(HF_DATASET))
+
+
+def _load_cached(cache_dir: str, idx: int) -> List[Dict[str, Any]] | None:
+    path = os.path.join(cache_dir, f"dialog_{idx}.json")
+    if not os.path.exists(path):
+        return None
+    with open(path) as f:
+        return json.load(f)
+
+
+def _save_to_cache(cache_dir: str, idx: int, data: List[Dict[str, Any]]) -> None:
+    os.makedirs(cache_dir, exist_ok=True)
+    path = os.path.join(cache_dir, f"dialog_{idx}.json")
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2, default=str)
 
 
 # ── Tokenizer / model loading ─────────────────────────────────────────────
@@ -318,8 +347,12 @@ def main():
     raw = load_dataset(HF_DATASET, split="train")
     print(f"  {len(raw)} rows")
 
+    cdir = _preference_cache_dir()
+    print(f"  Cache dir: {cdir}")
+
     all_samples: List[Dict[str, Any]] = []
     errors = 0
+    cached_count = 0
 
     n = min(N_DIALOGUES, len(raw))
     for i in tqdm(range(n), desc="Processing"):
@@ -330,10 +363,19 @@ def main():
         if not any(m["role"] == "assistant" for m in sim_msgs):
             continue
 
+        cached = _load_cached(cdir, i)
+        if cached is not None:
+            for s in cached:
+                s["dialogue_id"] = dialogue_id
+            all_samples.extend(cached)
+            cached_count += 1
+            continue
+
         try:
             pref = process_conversation(model, tokenizer, sim_msgs, device)
             for s in pref:
                 s["dialogue_id"] = dialogue_id
+            _save_to_cache(cdir, i, pref)
             all_samples.extend(pref)
         except Exception as e:
             print(f"  Error on {dialogue_id}: {e}")
@@ -341,7 +383,8 @@ def main():
             errors += 1
 
     print(
-        f"\n{len(all_samples)} preference samples from {n} conversations ({errors} errors)"
+        f"\n{len(all_samples)} preference samples from {n} conversations "
+        f"({cached_count} from cache, {errors} errors)"
     )
 
     if all_samples:
