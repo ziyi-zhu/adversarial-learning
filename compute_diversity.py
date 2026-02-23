@@ -9,6 +9,7 @@ Metrics:
   - Distinct-3: unique trigrams / total trigrams
   - Word Entropy (unigram Shannon entropy)
   - Mean Utterance Length (tokens)
+  - Mean Conversation Length (user turns per dialogue)
 """
 
 import json, os, math, sys
@@ -24,7 +25,9 @@ def extract_user_utterances(results_path):
         data = json.load(f)
 
     utterances = []
+    conversation_lengths = []
     for dialog in data["per_dialogue"]:
+        n_user = 0
         for turn in dialog["conversation"]:
             text = turn.get("user_nl") or turn.get("user") or ""
             text = str(text).strip()
@@ -32,7 +35,9 @@ def extract_user_utterances(results_path):
                 text = text.replace("[END]", "").replace("**", "").strip()
                 if text:
                     utterances.append(text)
-    return utterances
+                    n_user += 1
+        conversation_lengths.append(n_user)
+    return utterances, conversation_lengths
 
 
 def tokenize(text):
@@ -61,7 +66,7 @@ def compute_entropy(tokens):
     return entropy
 
 
-def compute_metrics(utterances):
+def compute_metrics(utterances, conversation_lengths=None):
     all_tokens = []
     lengths = []
     for utt in utterances:
@@ -72,7 +77,7 @@ def compute_metrics(utterances):
     n_total = len(all_tokens)
     n_unique = len(set(all_tokens))
 
-    return {
+    out = {
         "n_utterances": len(utterances),
         "n_tokens": n_total,
         "n_unique_tokens": n_unique,
@@ -83,6 +88,11 @@ def compute_metrics(utterances):
         "entropy": compute_entropy(all_tokens),
         "mean_utt_length": sum(lengths) / max(len(lengths), 1),
     }
+    if conversation_lengths:
+        out["mean_conversation_length"] = sum(conversation_lengths) / max(len(conversation_lengths), 1)
+    else:
+        out["mean_conversation_length"] = None
+    return out
 
 
 def extract_ground_truth_utterances(n_dialogues=None):
@@ -94,13 +104,17 @@ def extract_ground_truth_utterances(n_dialogues=None):
         test_dialogues = test_dialogues[:n_dialogues]
 
     utterances = []
+    conversation_lengths = []
     for dlg in test_dialogues:
+        n_user = 0
         for turn in dlg["turns"]:
             if turn["speaker"] == "user":
                 text = turn["utterance"].strip()
                 if text:
                     utterances.append(text)
-    return utterances
+                    n_user += 1
+        conversation_lengths.append(n_user)
+    return utterances, conversation_lengths
 
 
 def main():
@@ -117,31 +131,33 @@ def main():
             if n_dialogues:
                 break
 
-    gt_utterances = extract_ground_truth_utterances(n_dialogues)
-    all_metrics["ground_truth"] = compute_metrics(gt_utterances)
+    gt_utterances, gt_conv_lengths = extract_ground_truth_utterances(n_dialogues)
+    all_metrics["ground_truth"] = compute_metrics(gt_utterances, gt_conv_lengths)
 
     for entry in sorted(os.listdir(RESULTS_DIR)):
         results_path = os.path.join(RESULTS_DIR, entry, "results.json")
         if not os.path.isfile(results_path):
             continue
         try:
-            utterances = extract_user_utterances(results_path)
+            utterances, conv_lengths = extract_user_utterances(results_path)
         except (KeyError, json.JSONDecodeError):
             print(f"  {entry}: could not parse results.json, skipping")
             continue
         if not utterances:
             print(f"  {entry}: no user utterances found, skipping")
             continue
-        metrics = compute_metrics(utterances)
+        metrics = compute_metrics(utterances, conv_lengths)
         all_metrics[entry] = metrics
 
-    header = f"{'Combo':<22} {'Utts':>5} {'Tokens':>7} {'TTR':>6} {'D-1':>6} {'D-2':>6} {'D-3':>6} {'Entropy':>8} {'AvgLen':>7}"
+    header = f"{'Combo':<22} {'Utts':>5} {'Tokens':>7} {'TTR':>6} {'D-1':>6} {'D-2':>6} {'D-3':>6} {'Entropy':>8} {'AvgLenUttr':>9} {'AvgLenConv':>9}"
     print(header)
     print("-" * len(header))
     for combo, m in all_metrics.items():
+        avg_conv = m["mean_conversation_length"]
+        avg_conv_str = f"{avg_conv:>9.1f}" if avg_conv is not None else "      n/a"
         print(f"{combo:<22} {m['n_utterances']:>5} {m['n_tokens']:>7} "
               f"{m['ttr']:>6.3f} {m['distinct_1']:>6.3f} {m['distinct_2']:>6.3f} "
-              f"{m['distinct_3']:>6.3f} {m['entropy']:>8.3f} {m['mean_utt_length']:>7.1f}")
+              f"{m['distinct_3']:>6.3f} {m['entropy']:>8.3f} {m['mean_utt_length']:>9.1f} {avg_conv_str}")
 
     out_path = os.path.join(RESULTS_DIR, "diversity_metrics.json")
     with open(out_path, "w") as f:
