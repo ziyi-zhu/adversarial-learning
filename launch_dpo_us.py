@@ -12,11 +12,12 @@ import argparse
 import json
 import os
 import tempfile
+from collections import Counter
 
 from datasets import load_dataset
 from together import Together
 
-HF_PREF_REPO = os.environ.get("HF_PREF_REPO", "slingshot/multiwoz-2.1-user-pref-v1")
+HF_PREF_REPO = os.environ.get("HF_PREF_REPO", "slingshot/multiwoz-2.1-user-pref-sft")
 MODEL = "slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-sft-4dcc3672"
 
 
@@ -40,14 +41,19 @@ def main():
     parser.add_argument(
         "--dpo-beta",
         type=float,
-        default=0.1,
-        help="DPO beta parameter (default: 0.1)",
+        default=1.0,
+        help="DPO beta parameter (default: 1.0)",
+    )
+    parser.add_argument(
+        "--filter-chosen-rejected",
+        action="store_true",
+        help="Keep only rows where chosen_reward > 0 and rejected_reward < 0 (default: False)",
     )
     parser.add_argument(
         "--top-margin-frac",
         type=float,
-        default=0.5,
-        help="After chosen>0/rejected<0 filter, keep this fraction of pairs with highest (chosen-rejected) margin (default: 0.5)",
+        default=1.0,
+        help="After chosen>0/rejected<0 filter, keep this fraction of pairs with highest (chosen-rejected) margin (default: 1.0)",
     )
     parser.add_argument(
         "--dry-run",
@@ -64,9 +70,9 @@ def main():
     ds = load_dataset(args.dataset, split=args.split)
     print(f"  Loaded {len(ds)} examples")
 
-    # Filter: keep only rows where chosen_reward > 0 and rejected_reward < 0
-    ds = ds.filter(lambda x: x["chosen_reward"] > 0 and x["rejected_reward"] < 0)
-    print(f"  After filtering (chosen > 0, rejected < 0): {len(ds)} examples")
+    if args.filter_chosen_rejected:
+        ds = ds.filter(lambda x: x["chosen_reward"] > 0 and x["rejected_reward"] < 0)
+        print(f"  After filtering (chosen > 0, rejected < 0): {len(ds)} examples")
 
     # Keep only top fraction by margin (chosen_reward - rejected_reward)
     if args.top_margin_frac < 1.0 and len(ds) > 0:
@@ -82,6 +88,25 @@ def main():
 
     if len(ds) == 0:
         raise SystemExit("No examples remain after filtering.")
+
+    # Count rows where chosen response contains [END]
+    def chosen_content(row):
+        c = row["chosen"]
+        return (c.get("content") or "") if isinstance(c, dict) else (c or "")
+
+    n_chosen_with_end = sum(
+        1 for i in range(len(ds)) if "[END]" in chosen_content(ds[i])
+    )
+    print(f"  Rows with [END] in chosen response: {n_chosen_with_end} / {len(ds)}")
+
+    # Distribution of assistant_turn_index in final dataset
+    if "assistant_turn_index" in ds.column_names:
+        dist = Counter(ds["assistant_turn_index"])
+        print("  assistant_turn_index distribution:")
+        for idx in sorted(dist.keys()):
+            print(f"    turn {idx}: {dist[idx]}")
+    else:
+        print("  (no assistant_turn_index column in dataset)")
 
     def to_dpo_row(example):
         return {
