@@ -8,7 +8,7 @@ Pipeline:
   3. For each simulated conversation:
      a. Feed system + assistant messages to the discriminator.
      b. Compute log-odds-delta reward at every assistant (user-sim) EOT.
-     c. Identify the highest- and lowest-reward positions.
+     c. Identify the top 2 lowest-reward positions.
      d. At those positions, regenerate 8 alternatives with the US model via
         litellm (same prompt format and temperature as LLM_US).
      e. Re-score all 9 candidates (original + 8 new).
@@ -41,17 +41,14 @@ from transformers import (
 # ── Constants ──────────────────────────────────────────────────────────────
 
 DISCRIMINATOR_CHECKPOINT = (
-    "/mnt/workspace/adversarial-learning/output/user-disc-sft/checkpoint-107"
+    "/mnt/workspace/adversarial-learning/output/user-disc-dial-it2/checkpoint-107"
 )
 DISCRIMINATOR_BASE_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 
-HF_DATASET = "slingshot/multiwoz-2.1-user-disc-sft"
-HF_OUTPUT_REPO = "slingshot/multiwoz-2.1-user-pref-sft"
+HF_DATASET = "slingshot/multiwoz-2.1-user-disc-dial-it2"
+HF_OUTPUT_REPO = "slingshot/multiwoz-2.1-user-pref-dial-it2"
 
-US_MODEL = (
-    "together_ai/slingshot/"
-    "Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-sft-4dcc3672"
-)
+US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it2-7d06c9f1-6710a3db"
 US_TEMPERATURE = 0.8
 US_MAX_TOKENS = 256
 NUM_REGENERATIONS = 8  # +1 original = 9 total candidates
@@ -270,12 +267,12 @@ def process_conversation(
     assistant_indices = [
         i for i, m in enumerate(full_messages) if m["role"] == "assistant"
     ]
-    deltas = [r["log_odds_delta"] for r in rewards]
-    max_pos = int(np.argmax(deltas))
-    min_pos = int(np.argmin(deltas))
+    deltas = np.array([r["log_odds_delta"] for r in rewards])
+    # Top 2 lowest-reward positions (ascending order, take first 2)
+    lowest_two_positions = np.argsort(deltas)[:2].tolist()
 
     samples: List[Dict[str, Any]] = []
-    for pos in sorted(set([max_pos, min_pos])):
+    for pos in sorted(set(lowest_two_positions)):
         asst_idx = assistant_indices[pos]
         original_text = full_messages[asst_idx]["content"]
         prev_prob = rewards[pos]["prev_prob"]

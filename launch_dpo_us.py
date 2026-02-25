@@ -12,13 +12,15 @@ import argparse
 import json
 import os
 import tempfile
-from collections import Counter
+from collections import Counter, defaultdict
 
 from datasets import load_dataset
 from together import Together
 
-HF_PREF_REPO = os.environ.get("HF_PREF_REPO", "slingshot/multiwoz-2.1-user-pref-sft")
-MODEL = "slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-sft-4dcc3672"
+HF_PREF_REPO = os.environ.get(
+    "HF_PREF_REPO", "slingshot/multiwoz-2.1-user-pref-dial-it2"
+)
+MODEL = "slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it2-7d06c9f1"
 
 
 def main():
@@ -35,7 +37,7 @@ def main():
     )
     parser.add_argument(
         "--suffix",
-        default="multiwoz-us-dial-it1",
+        default="multiwoz-us-dial-it3",
         help="Suffix for the fine-tuned model name",
     )
     parser.add_argument(
@@ -59,6 +61,13 @@ def main():
         "--dry-run",
         action="store_true",
         help="Prepare and check data only; do not upload or create job",
+    )
+    parser.add_argument(
+        "--max-samples-per-index",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Max samples to keep per assistant_turn_index before printing distribution (default: None, no limit)",
     )
     args = parser.parse_args()
 
@@ -99,12 +108,30 @@ def main():
     )
     print(f"  Rows with [END] in chosen response: {n_chosen_with_end} / {len(ds)}")
 
+    # Optionally limit samples per turn index (before printing distribution)
+    if (
+        args.max_samples_per_index is not None
+        and "assistant_turn_index" in ds.column_names
+    ):
+        idx_to_rows = defaultdict(list)
+        for i in range(len(ds)):
+            idx_to_rows[ds["assistant_turn_index"][i]].append(i)
+        keep = []
+        for turn_idx in sorted(idx_to_rows.keys()):
+            keep.extend(idx_to_rows[turn_idx][: args.max_samples_per_index])
+        ds = ds.select(sorted(keep))
+        print(
+            f"  After limiting to max {args.max_samples_per_index} samples per turn index: {len(ds)} examples"
+        )
+
     # Distribution of assistant_turn_index in final dataset
     if "assistant_turn_index" in ds.column_names:
         dist = Counter(ds["assistant_turn_index"])
+        total = len(ds)
         print("  assistant_turn_index distribution:")
         for idx in sorted(dist.keys()):
-            print(f"    turn {idx}: {dist[idx]}")
+            pct = 100 * dist[idx] / total
+            print(f"    turn {idx}: {dist[idx]} ({pct:.1f}%)")
     else:
         print("  (no assistant_turn_index column in dataset)")
 

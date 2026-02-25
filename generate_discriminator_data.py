@@ -40,12 +40,13 @@ from convlab.util.unified_datasets_util import load_dataset as load_convlab_data
 
 # LLM_US_MODEL = "openrouter/meta-llama/llama-3.1-70b-instruct"
 # LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-sft-4dcc3672"
-LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it1-a8c57d7f-6bb2624d"
+# LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it1-a8c57d7f-6bb2624d"
+LLM_US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it2-7d06c9f1-6710a3db"
 # LLM_RG_MODEL = "openrouter/meta-llama/llama-3.1-70b-instruct"
 LLM_RG_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-rg-sft-5c55bb5c"
 N_DIALOGUES = 1000
 INITIAL_SYSTEM_GREETING = "Hello, how may I help you today?"
-HF_REPO = "slingshot/multiwoz-2.1-user-disc-dial-it1"
+HF_REPO = "slingshot/multiwoz-2.1-user-disc-dial-it2"
 CACHE_DIR = "cache"
 MAX_TURNS = 20
 
