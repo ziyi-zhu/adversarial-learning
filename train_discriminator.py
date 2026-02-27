@@ -31,10 +31,10 @@ from transformers.data.data_collator import (
 
 # ── Constants ──────────────────────────────────────────────────────────────
 
-HF_DATASET = "slingshot/multiwoz-2.1-user-disc-dial-it2"
+HF_DATASET = "slingshot/multiwoz-2.1-user-disc-dial-it3"
 MODEL_NAME = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 OUTPUT_DIR = "output"
-RUN_NAME = "user-disc-dial-it2"
+RUN_NAME = "user-disc-dial-it3"
 WANDB_PROJECT = "DIAL"
 
 IGNORE_LABEL = -100
