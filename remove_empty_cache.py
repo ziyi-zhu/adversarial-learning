@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 """
-Remove empty/errored cache entries from baseline and discriminator runs.
+Remove empty/errored cache entries from baseline, discriminator, and preference runs.
 
-- Baselines (cache/baselines/): removes dialog_*.json where conversation is empty.
+- Baselines (cache/baselines/): removes dialog_*.json where conversation is empty
+  (failed requests often produce conversation: []).
 - Discriminator (cache/discriminator/): removes dialog_*.json where messages
   contain only system or have no assistant turns.
+- Preference (cache/preference/): removes dialog_*.json where the cached value is
+  an empty list []. process_conversation can write [] when there are too few
+  rewards or all regenerations fail; removing these lets the run retry.
 
 Usage:
   python remove_empty_cache.py           # delete empty caches
@@ -46,8 +50,18 @@ def is_empty_discriminator(path):
     return n_assistant == 0
 
 
+def is_empty_preference(path):
+    """True if this preference cache file is an empty list (no samples produced)."""
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return False
+    return isinstance(data, list) and len(data) == 0
+
+
 def main():
-    ap = argparse.ArgumentParser(description="Remove empty cache files from baselines and discriminator.")
+    ap = argparse.ArgumentParser(description="Remove empty cache files from baselines, discriminator, and preference.")
     ap.add_argument("--dry-run", action="store_true", help="Only print paths that would be removed")
     args = ap.parse_args()
 
@@ -102,6 +116,31 @@ def main():
     else:
         print("\nDirs checked (discriminator): (none — not a directory)")
         print(f"  {disc_root}")
+
+    # Preference: cache/preference/<dataset>/dialog_*.json
+    pref_root = os.path.join(CACHE_DIR, "preference")
+    if os.path.isdir(pref_root):
+        pref_dirs = {}
+        to_remove_pref = []
+        for dirpath, _dirnames, filenames in os.walk(pref_root):
+            dialog_files = [n for n in filenames if n.startswith("dialog_") and n.endswith(".json")]
+            if dialog_files:
+                pref_dirs[dirpath] = len(dialog_files)
+                for name in dialog_files:
+                    path = os.path.join(dirpath, name)
+                    if is_empty_preference(path):
+                        to_remove_pref.append(path)
+        print("\nDirs checked (preference):")
+        for d in sorted(pref_dirs):
+            print(f"  {d}  ({pref_dirs[d]} checked)")
+        for path in to_remove_pref:
+            print(path)
+            if not args.dry_run:
+                os.remove(path)
+            removed += 1
+    else:
+        print("\nDirs checked (preference): (none — not a directory)")
+        print(f"  {pref_root}")
 
     if args.dry_run:
         print(f"\n[dry-run] Would remove {removed} empty cache file(s).")
