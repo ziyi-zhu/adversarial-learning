@@ -41,14 +41,14 @@ from transformers import (
 # ── Constants ──────────────────────────────────────────────────────────────
 
 DISCRIMINATOR_CHECKPOINT = (
-    "/mnt/workspace/adversarial-learning/output/user-disc-dial-it2/checkpoint-107"
+    "/mnt/workspace/adversarial-learning/output/user-disc-dial-it3/checkpoint-107"
 )
 DISCRIMINATOR_BASE_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 
-HF_DATASET = "slingshot/multiwoz-2.1-user-disc-dial-it2"
-HF_OUTPUT_REPO = "slingshot/multiwoz-2.1-user-pref-dial-it2"
+HF_DATASET = "slingshot/multiwoz-2.1-user-disc-dial-it3"
+HF_OUTPUT_REPO = "slingshot/multiwoz-2.1-user-pref-dial-it3"
 
-US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it2-7d06c9f1-6710a3db"
+US_MODEL = "together_ai/slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it3-04142b70-52244b15"
 US_TEMPERATURE = 0.8
 US_MAX_TOKENS = 256
 NUM_REGENERATIONS = 8  # +1 original = 9 total candidates

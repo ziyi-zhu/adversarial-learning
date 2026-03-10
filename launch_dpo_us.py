@@ -18,9 +18,10 @@ from datasets import load_dataset
 from together import Together
 
 HF_PREF_REPO = os.environ.get(
-    "HF_PREF_REPO", "slingshot/multiwoz-2.1-user-pref-dial-it2"
+    "HF_PREF_REPO", "slingshot/multiwoz-2.1-user-pref-dial-it3"
 )
-MODEL = "slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it2-7d06c9f1"
+MODEL = "slingshot/Meta-Llama-3.1-70B-Instruct-Reference-multiwoz-us-dial-it3-04142b70"
+SUFFIX = "multiwoz-us-dial-it4"
 
 
 def main():
@@ -37,8 +38,8 @@ def main():
     )
     parser.add_argument(
         "--suffix",
-        default="multiwoz-us-dial-it3",
-        help="Suffix for the fine-tuned model name",
+        default=SUFFIX,
+        help=f"Suffix for the fine-tuned model name (default: {SUFFIX})",
     )
     parser.add_argument(
         "--dpo-beta",
